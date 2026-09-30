@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#0a6f43">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Aplicación para Conductor">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <link rel="stylesheet" href="style.css">
+  <title>Aplicación para Conductor</title>
+</head>
+<body>
+  <main id="app" class="app-shell">
+    <section id="home" class="screen active home-screen">
+      <div class="home-overlay"></div>
+      <header class="topbar">
+        <div class="brand-block">
+          <div class="brand">
+            <img src="icon-192.png" alt="" class="brand-icon">
+            <div><div class="brand-title">Aplicación para Conductor</div><div class="brand-sub">Jornadas · Repostajes · Estadísticas</div></div>
+          </div>
+          <div class="sync-pill" id="syncStatus">📱 Datos guardados en este dispositivo</div>
+        </div>
+        <div class="truck-tools">
+          <button id="truckBtn" class="icon-btn" title="Matrícula">🚛<span id="truckPlate">---</span></button>
+          <a id="restrictionsBtn" class="restriction-link" href="https://payonline.guretruck.com/Restrictions/Restrictions.aspx/GetRestricciones" target="_blank" rel="noopener noreferrer" aria-label="Restricciones para Camiones">Restricciones<br>para Camiones</a>
+        </div>
+      </header>
+      <div class="home-content">
+        <div class="status-card">
+          <span id="journeyStatusDot" class="status-dot"></span>
+          <div><strong id="journeyStatus">Jornada cerrada</strong><small id="journeyStatusText">Puedes iniciar una nueva jornada.</small><div id="journeyTimer" class="journey-timer"></div></div>
+        </div>
+        <div class="home-actions">
+          <button id="startBtn" class="main-action start">▶ Inicio de Jornada</button>
+          <button id="finishBtn" class="main-action finish">■ Fin de Jornada</button>
+          <button id="fuelBtn" class="main-action fuel">⛽ Registro Repostajes</button>
+        </div>
+        <div class="home-grid">
+          <button id="statsBtn" class="secondary-action">📊 Estadísticas</button>
+          <button id="historyBtn" class="secondary-action">📋 Historial</button>
+          <button id="settingsBtn" class="secondary-action">⚙️ Ajustes</button>
+          <button id="tachBtn" class="secondary-action">⏱️ Control Tacógrafo</button>
+                  </div>
+      </div>
+    </section>
+
+    <section id="startScreen" class="screen">
+      <header class="page-head"><button class="back" data-back>←</button><h1>Inicio de Jornada</h1></header>
+      <form id="startForm" class="form-card">
+        <label>Fecha y Hora Inicio
+          <div class="input-row"><input id="startDate" type="datetime-local" required><button type="button" class="auto-btn" data-now="startDate">AHORA</button></div>
+        </label>
+        <label>Kilómetros Iniciales<input id="startKm" type="number" min="0" step="1" inputmode="numeric" required></label>
+        <label>Lugar de Inicio<input id="startPlace" type="text" placeholder="Ciudad, País" required></label>
+        <label>Ubicación GPS
+          <div class="gps-row"><input id="startGps" type="text" readonly placeholder="Pulsa Obtener ubicación"><button type="button" class="gps-btn" data-gps="start">📍 Obtener</button></div>
+          <a id="startMap" class="map-link hidden" target="_blank" rel="noopener">Abrir en Google Maps</a>
+        </label>
+        <div class="form-actions"><button type="button" class="cancel-btn" data-back>Cancelar</button><button id="startSave" class="save-btn" type="submit">Guardar</button></div>
+      </form>
+    </section>
+
+    <section id="finishScreen" class="screen">
+      <header class="page-head"><button class="back" data-back>←</button><h1>Fin de Jornada</h1></header>
+      <form id="finishForm" class="form-card">
+        <label>Fecha y Hora Fin
+          <div class="input-row"><input id="finishDate" type="datetime-local" required><button type="button" class="auto-btn" data-now="finishDate">AHORA</button></div>
+        </label>
+        <label>Kilómetros Finales<input id="finishKm" type="number" min="0" step="1" inputmode="numeric" required></label>
+        <label>Lugar de Fin<input id="finishPlace" type="text" placeholder="Ciudad, País" required></label>
+        <label>Horas conducidas
+          <div class="two-inputs"><select id="driveHours"></select><select id="driveMinutes"></select></div>
+          <small>Horas y minutos realmente conducidos durante la jornada.</small>
+        </label>
+        <label>Ubicación GPS
+          <div class="gps-row"><input id="finishGps" type="text" readonly placeholder="Pulsa Obtener ubicación"><button type="button" class="gps-btn" data-gps="finish">📍 Obtener</button></div>
+          <a id="finishMap" class="map-link hidden" target="_blank" rel="noopener">Abrir en Google Maps</a>
+        </label>
+        <label class="notes-label"><span id="finishIncidentsLabel">Incidencias / Notas del conductor</span><textarea id="finishNote" placeholder="Escribe aquí cualquier incidencia u observación de la jornada…"></textarea></label>
+        <div class="form-actions"><button type="button" class="cancel-btn" data-back>Cancelar</button><button id="finishSave" class="save-btn" type="submit">Guardar</button></div>
+      </form>
+    </section>
+
+    <section id="fuelScreen" class="screen">
+      <header class="page-head"><button class="back" data-back>←</button><h1>Registro Repostajes</h1></header>
+      <form id="fuelForm" class="form-card">
+        <label>Lugar<input id="fuelPlace" type="text" placeholder="Ciudad, País" required></label>
+        <label>Kilómetros<input id="fuelKm" type="number" min="0" step="1" inputmode="numeric" required></label>
+        <label>Litros<input id="fuelLiters" type="number" min="0" step="0.01" inputmode="decimal" required></label>
+        <label class="check-line"><input id="fuelFull" type="checkbox"><span>Depósito lleno</span></label>
+        <div class="form-actions"><button type="button" class="cancel-btn" data-back>Cancelar</button><button id="fuelSave" class="save-btn" type="submit">Guardar</button></div>
+      </form>
+    </section>
+
+    <section id="statsScreen" class="screen">
+      <header class="page-head"><button class="back" data-back>←</button><h1>Estadísticas</h1><button id="resetStatsBtn" class="reset-btn" title="Reiniciar estadísticas">↺ Reiniciar</button></header>
+      <div class="stats-wrap">
+        <div class="period-row"><div class="period-card"><span>Periodo en curso</span><strong id="periodLabel">26 → 25</strong></div><button id="changePeriodBtn" class="period-change-btn" type="button">Cambiar periodo</button></div>
+        <div id="periodEditor" class="period-editor hidden"><label>Primer día del periodo mensual<select id="periodStartDay"></select></label><div class="form-actions"><button id="cancelPeriodBtn" type="button" class="cancel-btn">Cancelar</button><button id="savePeriodBtn" type="button" class="save-btn">Guardar</button></div></div>
+        <div class="stats-grid">
+          <article><small id="statMonthLabel">Km mes en curso</small><strong id="monthKm">0 km</strong></article>
+          <article><small id="statTotalLabel">Km totales</small><strong id="totalKm">0 km</strong></article>
+          <article><small id="statYearLabel">Km del año</small><strong id="yearKm">0 km</strong></article>
+          <article><small id="statSpeedLabel">Velocidad media</small><strong id="avgSpeed">0 km/h</strong></article>
+          <article><small id="statConsumptionLabel">Consumo medio</small><strong id="avgConsumption">— L/100 km</strong></article>
+        </div>
+      </div>
+    </section>
+
+    <section id="historyScreen" class="screen">
+      <header class="page-head"><button class="back" data-back>←</button><h1>Historial</h1><button id="resetHistoryBtn" class="reset-btn" title="Reiniciar historial">↺ Reiniciar</button></header>
+      <div class="history-wrap">
+        <button id="fuelHistoryBtn" class="secondary-action wide history-fuel-btn">🧾 Historial de repostajes</button>
+        <div id="historyList"></div>
+      </div>
+    </section>
+
+    <section id="truckScreen" class="screen">
+      <header class="page-head"><button class="back" data-back>←</button><h1 id="truckScreenTitle">Camión</h1></header>
+      <form id="truckForm" class="form-card">
+        <div class="truck-change-row"><span></span><button id="changeTruckBtn" class="period-change-btn" type="button">Cambiar matrícula</button></div>
+        <label>Matrícula del camión<input id="truckInput" type="text" maxlength="20" placeholder="1234 ABC" required></label>
+        <div id="tachInitialFields">
+          <div class="section-title">⏱️ Control Tacógrafo</div>
+          <label>Conducción semanal acumulada<input id="tachWeekly" type="text" inputmode="numeric" placeholder="hh:mm"></label>
+          <label>Conducción bisemanal acumulada<input id="tachBiweekly" type="text" inputmode="numeric" placeholder="hh:mm"></label>
+          <label>Descansos diarios reducidos usados esta semana<input id="tachReducedDaily" type="number" min="0" max="3" step="1" value="0"></label>
+          <label>Ampliaciones a 10 h usadas esta semana<input id="tachTenHour" type="number" min="0" max="2" step="1" value="0"></label>
+          <label>Descansos semanales reducidos consecutivos<input id="tachConsecutiveReduced" type="number" min="0" max="2" step="1" value="0"></label>
+          <label>Fin del último descanso semanal<input id="tachLastWeeklyRest" type="datetime-local"></label>
+          <label>Último retorno a España / base<input id="tachLastReturn" type="datetime-local"></label>
+          <p class="note" id="tachManualNote">Estos datos iniciales proceden del tacógrafo y deben actualizarse cuando sea necesario.</p>
+        </div>
+        <div class="form-actions"><button type="button" class="cancel-btn" data-back>Cancelar</button><button class="save-btn" type="submit">Guardar</button></div>
+      </form>
+    </section>
+
+    <section id="editJourneyScreen" class="screen">
+      <header class="page-head"><button class="back" data-back>←</button><h1>Editar Jornada</h1></header>
+      <form id="editJourneyForm" class="form-card">
+        <input id="editJourneyId" type="hidden">
+        <p id="editInfo" class="edit-info"></p>
+        <fieldset>
+          <legend>Inicio de Jornada</legend>
+          <label>Fecha y Hora Inicio<input id="editStartDate" type="datetime-local" required></label>
+          <label>Kilómetros Iniciales<input id="editStartKm" type="number" min="0" step="1" inputmode="numeric" required></label>
+          <label>Lugar de Inicio<input id="editStartPlace" type="text" placeholder="Ciudad, País" required></label>
+        </fieldset>
+        <fieldset>
+          <legend>Fin de Jornada</legend>
+          <label>Fecha y Hora Fin<input id="editFinishDate" type="datetime-local"></label>
+          <label>Kilómetros Finales<input id="editFinishKm" type="number" min="0" step="1" inputmode="numeric"></label>
+          <label>Lugar de Fin<input id="editFinishPlace" type="text" placeholder="Ciudad, País"></label>
+          <label>Horas conducidas<div class="two-inputs"><select id="editDriveHours"></select><select id="editDriveMinutes"></select></div></label>
+        </fieldset>
+        <div class="form-actions"><button type="button" class="cancel-btn" data-back>Cancelar</button><button class="save-btn" type="submit">Guardar cambios</button></div>
+      </form>
+    </section>
+
+    <section id="tachScreen" class="screen">
+      <header class="page-head"><button class="back" data-back>←</button><h1 id="tachTitle">Control Tacógrafo</h1></header>
+      <div class="stats-wrap">
+        <div class="warning-card" id="tachWarning">Los datos del tacografo que aparecen en ésta aplicacion son orientativos. En caso de dudas es mejor contactar con departamento de Flota. Gracias</div>
+        <div id="tachStatus" class="tach-status"></div>
+        <div class="tach-grid">
+          <article><small id="tachWeekLabel">Conducción semanal</small><strong id="tachWeekValue">00:00 h / 56 h</strong><span>Disponible: <b id="tachWeekRemaining">56:00 h</b></span></article>
+          <article><small id="tachBiLabel">Conducción bisemanal</small><strong id="tachBiValue">00:00 h / 90 h</strong><span>Disponible: <b id="tachBiRemaining">90:00 h</b></span></article>
+          <article><small id="tachTenLabel">Ampliaciones a 10 h</small><strong id="tachTenValue">0 / 2</strong><span>Disponibles: <b id="tachTenRemaining">2</b></span></article>
+          <article><small id="tachReducedLabel">Descansos diarios reducidos</small><strong id="tachReducedValue">0 / 3</strong><span>Disponibles: <b id="tachReducedRemaining">3</b></span></article>
+          <article><small id="tachCompLabel">Compensación pendiente</small><strong id="tachCompValue">Sin compensación pendiente</strong></article>
+          <article><small id="tachWeeklyDeadlineLabel">Próximo límite para iniciar descanso semanal</small><strong id="tachWeeklyDeadline">Faltan datos</strong></article>
+        </div>
+        <button id="weeklyRestsBtn" class="secondary-action wide">📅 Descansos semanales</button>
+        <div class="list-card">
+          <h2 id="tachRulesTitle">Reglas principales</h2>
+          <p id="tachRulesText">9 h diarias, 10 h dos veces por semana, 56 h semanales y 90 h en dos semanas. Máximo 3 descansos diarios reducidos entre descansos semanales.</p>
+          <p id="tachInternationalText">Para transporte internacional de mercancías, dos descansos semanales reducidos consecutivos fuera de España pueden utilizarse bajo las condiciones reglamentarias.</p>
+          <p id="tachReturnText">La empresa debe organizar el retorno dentro del período aplicable.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="weeklyRestsScreen" class="screen">
+      <header class="page-head"><button class="back" data-back>←</button><h1 id="weeklyRestsTitle">Descansos semanales</h1></header>
+      <div class="stats-wrap">
+        <div class="list-card">
+          <h2 id="restHistoryTitle">Descansos semanales registrados</h2>
+          <div id="weeklyRestList"></div>
+        </div>
+        <div class="list-card">
+          <h2 id="registerRestTitle">Registrar descanso semanal</h2>
+          <form id="weeklyRestForm" class="compact-form">
+            <label>Inicio del descanso<input id="restStart" type="datetime-local" required></label>
+            <label>Fin del descanso<input id="restEnd" type="datetime-local" required></label>
+            <label class="check-line"><input id="restReduced" type="checkbox"><span>Descanso reducido</span></label>
+            <label class="check-line"><input id="restOutside" type="checkbox"><span>Realizado fuera de España</span></label>
+            <button class="save-btn" type="submit">Guardar</button>
+          </form>
+        </div>
+      </div>
+    </section>
+
+      </div>
+    </section>
+
+    <section id="journeyDetailScreen" class="screen">
+      <header class="page-head"><button id="journeyDetailBack" class="back" type="button">←</button><h1 id="journeyDetailTitle">Detalle de Jornada</h1></header>
+      <form id="journeyDetailForm" class="form-card">
+        <input id="detailJourneyId" type="hidden">
+        <div class="detail-card"><h2>Inicio</h2><div class="detail-line"><span>Fecha y hora</span><strong id="detailStart">—</strong></div><div class="detail-line"><span>Kilómetros</span><strong id="detailStartKm">—</strong></div><div class="detail-line"><span>Lugar</span><strong id="detailStartPlace">—</strong></div><a id="detailStartMap" class="map-link" target="_blank" rel="noopener">Ver ubicación en Google Maps</a></div>
+        <div class="detail-card"><h2>Fin</h2><div class="detail-line"><span>Fecha y hora</span><strong id="detailEnd">—</strong></div><div class="detail-line"><span>Kilómetros</span><strong id="detailEndKm">—</strong></div><div class="detail-line"><span>Lugar</span><strong id="detailEndPlace">—</strong></div><a id="detailEndMap" class="map-link" target="_blank" rel="noopener">Ver ubicación en Google Maps</a></div>
+        <div class="detail-card"><h2>Información detallada</h2><div class="detail-line"><span>Kilómetros</span><strong id="detailKm">—</strong></div><div class="detail-line"><span>Horas conducidas</span><strong id="detailDrive">—</strong></div><div class="detail-line"><span>Duración de la jornada</span><strong id="detailDuration">—</strong></div><div class="detail-line"><span id="detailPauseLabel">Pausa realizada</span><strong id="detailPause">—</strong></div></div>
+        <label class="notes-label">📝 <span id="incidentsLabel">Incidencias / Notas del conductor</span><textarea id="journeyNote" rows="5" placeholder="Escribe aquí cualquier incidencia u observación de la jornada…"></textarea></label>
+        <div class="form-actions"><button id="journeyDetailBackBottom" type="button" class="cancel-btn">Volver</button><button class="save-btn" type="submit">Guardar cambios</button></div>
+      </form>
+    </section>
+
+    <section id="fuelHistoryScreen" class="screen">
+      <header class="page-head"><button class="back" data-back>←</button><h1 id="fuelHistoryTitle">Historial de repostajes</h1></header>
+      <div class="history-wrap" id="fuelHistoryList"></div>
+    </section>
+
+    <section id="settingsScreen" class="screen">
+      <header class="page-head"><button class="back" data-back>←</button><h1>Ajustes</h1></header>
+      <div class="settings-card">
+        <h2>Almacenamiento local</h2>
+        <p>Esta versión guarda las jornadas, repostajes, matrícula, estadísticas e historial directamente en este dispositivo.</p>
+        <button id="exportBtn" class="secondary-action wide">💾 Exportar copia de seguridad</button>
+        <label class="backup-label">📥 Importar copia de seguridad
+          <input id="importFile" type="file" accept="application/json" hidden>
+        </label>
+        <p class="note">La copia permite recuperar tus datos si cambias de dispositivo. Google Sheets no se utiliza en esta versión.</p>
+      </div>
+    </section>
+  </main>
+  <div id="toast" class="toast"></div>
+  <script src="config.js"></script>
+  <script src="i18n.js"></script>
+  <script src="app.js"></script><script>if("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js");</script>
+</body>
+</html>
