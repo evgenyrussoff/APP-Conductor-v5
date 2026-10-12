@@ -1,34 +1,36 @@
-APLICACIÓN PARA CONDUCTOR V5.4.2.0
+APLICACIÓN PARA CONDUCTOR V5.4.3
 ================================
 
-NOVEDADES V5.4.2
-- Corregido el cálculo semanal y bisemanal al cruzar de domingo a lunes: la lectura manual conserva la semana actual y la anterior solo mientras pertenecen a la ventana bisemanal; la semana más antigua deja de contar al cambiar la semana.
-- El total bisemanal se calcula como la suma de las dos semanas lunes-domingo vigentes, siguiendo el enfoque de la versión comparada del compañero.
+CAMBIOS V5.4.3
 --------------
-- Nuevo acceso «Caducidades», situado a la izquierda de «Registro Repostajes».
-- Apartado de documentos integrado en la propia aplicación y guardado en el mismo almacenamiento local del dispositivo.
-- Indicador interno del botón Caducidades: amarillo cuando hay documentos dentro de su plazo de aviso y rojo si existe algún documento caducado. Si hay ambos estados, prevalece el rojo.
-- La lista de documentos comienza vacía; no se importan automáticamente los registros de la antigua PWA Mis Documentos.
-- Alta, edición, búsqueda y eliminación de documentos; aviso configurable con antelación.
-- No hay notificaciones push, cuenta, API ni servidor para Caducidades. El indicador se actualiza al abrir la app o volver a la pantalla principal, no mientras la aplicación permanece cerrada.
-- La copia de seguridad general incluye los documentos. Al importar una copia V5.4.1 se restauran junto con el resto de los datos. Al importar una copia antigua sin el campo documents, se conservan los documentos locales existentes.
-- Corrección del calendario semanal del tacógrafo: al iniciar una nueva jornada, el descanso desde el fin de la jornada anterior hasta el nuevo inicio puede aparecer en el día correcto, incluidos los cambios de domingo a lunes.
-- Refuerzo del recálculo de descansos diarios reducidos para respetar la marca automática guardada al cerrar una jornada con más de 13 horas de disponibilidad.
-- Mejora del formulario de repostajes: fecha a ancho completo y campos de kilómetros/litros organizados en columnas cuando el espacio lo permite.
-- Se mantienen los 7 idiomas de la aplicación.
+- En Control Tacógrafo, las conducciones semanal y bisemanal aparecen en tarjetas contiguas.
+- Nueva tarjeta «Horas de conducción disponibles»: muestra el menor entre el tiempo restante hasta 56:00 h semanales y 90:00 h bisemanales.
+- Eliminado el botón manual «Recalcular». El control sigue actualizando sus cálculos al abrir la pantalla y al actualizar los datos.
+- En el diálogo de primera matrícula/cambio de matrícula se elimina «Último retorno a España / base» y se añade el tipo del último descanso semanal: 45 h o más, o descanso reducido de 24 h o más. La selección ayuda a actualizar el contador de descansos reducidos consecutivos cuando se introduce una fecha de descanso.
+- En Caducidades, el botón de la lista es «+ Añadir» y abre el formulario. Dentro del formulario, el botón de acción se llama «Guardar».
+- Ajustado el ancho del campo «Fecha del repostaje» para que coincida con los demás campos y no llegue al borde de la pantalla.
+- Optimizado camion.jpg de 1.204.555 bytes a aproximadamente 366.676 bytes, conservando el nombre del archivo y ajustando la imagen a 1280 × 1707 píxeles.
+- Renovada la caché del service worker para que el dispositivo descargue los archivos de V5.4.3.
 
 INSTALACIÓN / ACTUALIZACIÓN
 ---------------------------
-1. Haz una copia de seguridad desde Ajustes antes de actualizar.
-2. Sustituye en GitHub Pages los archivos por todos los archivos de esta versión, manteniendo los nombres y la estructura.
-3. Abre la aplicación con conexión a Internet para que se descarguen los archivos nuevos. Si el iPhone sigue mostrando la versión anterior, cierra la PWA por completo y vuelve a abrirla; el service worker de V5.4.2 tiene una caché nueva.
-4. Los documentos se guardan en el mismo almacenamiento local que las jornadas y repostajes. Para conservarlos al cambiar de dispositivo, utiliza la copia de seguridad general de V5.4.2.
+1. Antes de actualizar, exporta una copia de seguridad desde Ajustes.
+2. Sustituye en GitHub Pages los archivos por todos los archivos de esta versión, conservando los nombres y la estructura de carpetas.
+3. Abre la aplicación con conexión a Internet para que el navegador descargue la versión nueva. Si aparece la versión anterior, cierra por completo la PWA y vuelve a abrirla.
+4. Después de que la nueva versión se haya descargado correctamente, la caché de la PWA permite abrir la aplicación sin cobertura y utilizar los datos guardados en el dispositivo.
+
+FUNCIONAMIENTO SIN COBERTURA
+----------------------------
+- Las jornadas, repostajes, matrículas, estadísticas, historial y caducidades se guardan localmente en el dispositivo y pueden consultarse o modificarse sin conexión una vez instalada y cargada la aplicación.
+- Esta versión no utiliza Google Sheets ni sincronización con un servidor; por tanto, no hay una cola de registros pendientes que sincronizar al recuperar cobertura. Los datos permanecen en el dispositivo donde se registraron.
+- Google Maps, geolocalización y otros servicios externos pueden necesitar conexión.
+- Para cambiar de dispositivo o proteger los datos, exporta periódicamente la copia de seguridad general desde Ajustes.
 
 IMPORTANTE
 ----------
-- La aplicación guarda datos localmente en el dispositivo; no utiliza Google Sheets ni servidores para las funciones internas.
 - El control de tacógrafo es orientativo y no sustituye al tacógrafo oficial ni a las instrucciones del departamento de Flota.
-- Los indicadores de caducidad son internos a la aplicación; no generan avisos del sistema operativo cuando la PWA está cerrada.
+- Las opciones 45 h / 24 h son una clasificación de referencia introducida por el usuario; revisa siempre las lecturas y descansos reales en el tacógrafo.
+- Las alertas de caducidad son internas a la aplicación y no generan notificaciones del sistema operativo cuando la PWA está cerrada.
 
 --- HISTORIAL DE LA VERSIÓN BASE ---
 

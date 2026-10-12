@@ -143,7 +143,7 @@
           <label>Ampliaciones a 10 h usadas esta semana<input id="tachTenHour" type="number" min="0" max="2" step="1" value="0"></label>
           <label>Descansos semanales reducidos consecutivos<input id="tachConsecutiveReduced" type="number" min="0" max="2" step="1" value="0"></label>
           <label>Fin del último descanso semanal<input id="tachLastWeeklyRest" type="datetime-local"></label>
-          <label>Último retorno a España / base<input id="tachLastReturn" type="datetime-local"></label>
+          <label id="tachLastRestTypeLabel">Tipo del último descanso semanal<select id="tachLastRestType"><option value="45">Igual o mayor de 45 h</option><option value="24">Reducido (24 h o más)</option></select></label>
           <p class="note" id="tachManualNote">Estos datos iniciales proceden del tacógrafo y deben actualizarse cuando sea necesario.</p>
         </div>
         <div class="form-actions"><button type="button" class="cancel-btn" data-back>Cancelar</button><button class="save-btn" type="submit">Guardar</button></div>
@@ -176,11 +176,12 @@
       <header class="page-head"><button class="back" data-back>←</button><h1 id="tachTitle">Control Tacógrafo</h1></header>
       <div class="stats-wrap">
         <div class="warning-card" id="tachWarning">Los datos del tacografo que aparecen en ésta aplicacion son orientativos. En caso de dudas es mejor contactar con departamento de Flota. Gracias</div>
-        <div class="tach-action-row"><button id="recalcTachBtn" class="period-change-btn recalc-btn" type="button">🔄 Recalcular</button><button id="tachManualHoursBtn" class="period-change-btn manual-tach-btn" type="button">⏱️ Actualizar horas reales</button></div>
+        <div class="tach-action-row"><button id="tachManualHoursBtn" class="period-change-btn manual-tach-btn" type="button">⏱️ Actualizar horas reales</button></div>
         <div id="tachStatus" class="tach-status"></div>
         <div class="tach-grid">
-          <article><small id="tachWeekLabel">Conducción semanal</small><strong id="tachWeekValue">00:00 h / 56 h</strong><span>Disponible: <b id="tachWeekRemaining">56:00 h</b></span></article>
-          <article><small id="tachBiLabel">Conducción bisemanal</small><strong id="tachBiValue">00:00 h / 90 h</strong><span>Disponible: <b id="tachBiRemaining">90:00 h</b></span></article>
+          <article class="tach-main-card"><small id="tachWeekLabel">Conducción semanal</small><strong id="tachWeekValue">00:00 h / 56 h</strong><span>Disponible: <b id="tachWeekRemaining">56:00 h</b></span></article>
+          <article class="tach-main-card"><small id="tachBiLabel">Conducción bisemanal</small><strong id="tachBiValue">00:00 h / 90 h</strong><span>Disponible: <b id="tachBiRemaining">90:00 h</b></span></article>
+          <article class="tach-available-card"><small id="tachAvailableLabel">Horas de conducción disponibles</small><strong id="tachAvailableValue">56:00 h</strong><span id="tachAvailableHelp">Según el límite semanal o bisemanal que se alcance antes</span></article>
           <article><small id="tachTenLabel">Ampliaciones a 10 h</small><strong id="tachTenValue">0 / 2</strong><span>Disponibles: <b id="tachTenRemaining">2</b></span></article>
           <article><small id="tachReducedLabel">Descansos diarios reducidos</small><strong id="tachReducedValue">0 / 3</strong><span>Disponibles: <b id="tachReducedRemaining">3</b></span></article>
           <article><small id="tachCompLabel">Compensación pendiente</small><strong id="tachCompValue">Sin compensación pendiente</strong></article>
@@ -279,7 +280,7 @@
           <article class="summary-expired"><strong id="documentsCountExpired">0</strong><small id="documentsExpiredLabel">Caducados</small></article>
         </div>
         <div class="list-card documents-list-card">
-          <div class="documents-list-head"><h2 id="documentsListTitle">Mis documentos</h2><button id="documentAddBtn" class="save-btn" type="button">＋ Añadir</button></div>
+          <div class="documents-list-head"><h2 id="documentsListTitle">Mis documentos</h2><button id="documentAddBtn" class="save-btn" type="button">+ Añadir</button></div>
           <input id="documentsSearch" class="documents-search" type="search" placeholder="Buscar documento…">
           <div id="documentsList"></div>
           <p id="documentsEmpty" class="documents-empty">Todavía no hay documentos. Pulsa «Añadir» para empezar.</p>
@@ -305,7 +306,7 @@
           <option value="90d">90 días</option>
         </select>
       </label>
-      <div class="form-actions"><button id="documentCancelBtn" type="button" class="cancel-btn">Cancelar</button><button id="documentSaveBtn" type="submit" class="save-btn">＋ Añadir</button></div>
+      <div class="form-actions"><button id="documentCancelBtn" type="button" class="cancel-btn">Cancelar</button><button id="documentSaveBtn" type="submit" class="save-btn">Guardar</button></div>
     </form>
   </dialog>
         <div id="manualTachHoursOverlay" class="modal-overlay" aria-hidden="true"><div class="modal-card"><h2>⏱️ <span id="manualTachHoursTitle">Actualizar horas reales</span></h2><p id="manualTachHoursMessage">Introduce las lecturas actuales que aparecen en el tacógrafo. Estas horas serán el nuevo punto de partida de la aplicación.</p><div class="cross-week-calculated manual-tach-calculated"><div><small id="manualTachCalculatedWeeklyLabel">La aplicación tiene calculado</small><strong id="manualTachCalculatedWeekly">00:00 h</strong><span id="manualTachCalculatedWeeklyText">Conducción semanal</span></div><div><small>&nbsp;</small><strong id="manualTachCalculatedBiweekly">00:00 h</strong><span id="manualTachCalculatedBiweeklyText">Conducción bisemanal</span></div></div><p id="manualTachInstruction" class="note">Introduce los valores reales del tacógrafo:</p><div class="compact-form"><label id="manualTachWeeklyLabel">Horas semanales actuales<input id="manualTachWeekly" type="text" inputmode="numeric" placeholder="hh:mm"></label><label id="manualTachBiweeklyLabel">Horas bisemanales actuales<input id="manualTachBiweekly" type="text" inputmode="numeric" placeholder="hh:mm"></label></div><div class="form-actions"><button id="manualTachCancel" type="button" class="cancel-btn">Cancelar</button><button id="manualTachSave" type="button" class="save-btn">Actualizar datos</button></div></div></div>
