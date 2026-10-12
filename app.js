@@ -275,7 +275,24 @@ function weekLabel(ws){const we=addDays(ws,6);return `${ws.toLocaleDateString(I1
 function weekKeyFromDate(d){return weekKey(new Date(d))}
 function initialWeeklyForWeek(ws){const t=ensureTachMeta(),base=t.baselineAt?new Date(t.baselineAt):null;if(!base||isNaN(base)||weekKeyFromDate(base)!==weekKeyFromDate(ws))return 0;return Number(t.initialWeeklySnapshot??t.weeklyDriveMin)||0}
 function appDrivingForWeek(ws,afterDate=null){const we=addDays(ws,7);return completedJourneys().filter(j=>{const d=journeyDateForWeek(j);return d>=ws&&d<we&&(!afterDate||d>afterDate)}).reduce((s,j)=>s+(Number(j.driveMin)||0),0)}
-function calcWeekTotal(ws){const t=ensureTachMeta(),base=t.baselineAt?new Date(t.baselineAt):null;if(base&&!isNaN(base)&&weekKeyFromDate(base)===weekKeyFromDate(ws))return initialWeeklyForWeek(ws)+appDrivingForWeek(ws,base);return appDrivingForWeek(ws)}
+function calcWeekTotal(ws){
+  const t=ensureTachMeta(),base=t.baselineAt?new Date(t.baselineAt):null;
+  const targetKey=weekKeyFromDate(ws);
+  if(base&&!isNaN(base)){
+    const baseKey=weekKeyFromDate(base);
+    // The manual/initial tachograph reading describes the week in which it was
+    // entered plus the preceding week's share of the biweekly total. Once the
+    // baseline week becomes the previous week, only its weekly snapshot remains;
+    // the older week's share must roll out of the 2-week window.
+    if(baseKey===targetKey)return initialWeeklyForWeek(ws)+appDrivingForWeek(ws,base);
+    if(baseKey===weekKeyFromDate(addDays(ws,7))){
+      const bi=Number(t.initialBiweeklySnapshot??t.biweeklyDriveMin)||0;
+      const weekly=Number(t.initialWeeklySnapshot??t.weeklyDriveMin)||0;
+      return Math.max(0,bi-weekly);
+    }
+  }
+  return appDrivingForWeek(ws);
+}
 function recalculateTachograph(persist=true){
   const t=ensureTachMeta(),now=new Date(),current=weekStart(now),previous=addDays(current,-7);
   if(t.initialWeeklySnapshot==null)t.initialWeeklySnapshot=Number(t.weeklyDriveMin)||0;
@@ -296,7 +313,7 @@ function recalculateTachograph(persist=true){
   const initialReduced=(base&&!isNaN(base)&&weekKeyFromDate(base)===weekKeyFromDate(current))?Number(t.initialReducedDailySnapshot||0):0;
   const reduced=Math.min(3,initialReduced+reducedDailyFromApp());t.reducedDailyUsed=reduced;
   t.pendingCompMin=(t.weeklyRests||[]).reduce((sum,r)=>sum+(Number(r.compMin)||0),0);
-  t.lastRecalculatedAt=now.toISOString();t.calcVersion="5.4.0";
+  t.lastRecalculatedAt=now.toISOString();t.calcVersion="5.4.2";
   if(persist)localStorage.setItem(DB_KEY,JSON.stringify(state));
   return {currentTotal,previousTotal,biweeklyTotal:calculatedBiweekly};
 }
@@ -329,20 +346,11 @@ function reducedDailyFromApp(){
   return Math.min(3,count);
 }
 function biweeklyTotal(){
-  const now=new Date(),ws=weekStart(now),previous=addDays(ws,-7),twoWeekEnd=addDays(ws,7),t=ensureTachMeta();
-  // A manual reading is a real tachograph snapshot. From that exact moment
-  // forward we add only journeys that actually start after the snapshot.
-  // We never add the old snapshot to the complete two-week journey total.
-  const manualBase=t.manualTachBaselineAt?new Date(t.manualTachBaselineAt):null;
-  if(manualBase&&!isNaN(manualBase)){
-    const snap=Number(t.initialBiweeklySnapshot||t.biweeklyDriveMin)||0;
-    return snap+completedJourneys().filter(j=>{
-      const d=new Date(j.startDate||j.endDate);
-      return !isNaN(d)&&d>=manualBase&&d<twoWeekEnd;
-    }).reduce((sum,j)=>sum+(Number(j.driveMin)||0),0);
-  }
-  // Without a manual baseline, use the fixed Monday-Sunday weeks. This keeps
-  // Recalcular from double-counting an old automatic snapshot.
+  // A biweekly total is always the sum of the current Monday-Sunday week and
+  // the immediately preceding Monday-Sunday week. calcWeekTotal() knows how
+  // to use a snapshot only while its week is inside that rolling window; this
+  // prevents an old manual reading from keeping the oldest week forever.
+  const ws=weekStart(new Date()),previous=addDays(ws,-7);
   return calcWeekTotal(ws)+calcWeekTotal(previous);
 }
 function renderTach(){
@@ -413,7 +421,7 @@ function updateUI(){const open=state.journeys.find(j=>j.status==="OPEN"),lastClo
 function updateJourneyTimer(){const open=state.journeys.find(j=>j.status==="OPEN");const card=$("journeyTimer");if(!card)return;if(open){const mins=Math.max(0,Math.round((Date.now()-new Date(open.startDate))/60000));card.textContent=`${I18N.t("journeyDuration")}: ${minsToClock(mins)} h`;card.classList.add("running")}else{const last=state.journeys.filter(j=>j.status==="CLOSED"&&j.endDate).sort((a,b)=>new Date(b.endDate)-new Date(a.endDate))[0];const mins=last?Math.max(0,Math.round((Date.now()-new Date(last.endDate))/60000)):0;card.textContent=`${I18N.t("pauseSinceLast")}: ${String(Math.floor(mins/60)).padStart(3,"0")}:${String(mins%60).padStart(2,"0")} h (${(mins/1440).toFixed(1)} ${I18N.t("daysUnit")})`;card.classList.remove("running")}}
 setInterval(()=>{updateJourneyTimer();const active=document.querySelector("#home.active");if(active)updateUI()},1000);
 
-function exportBackup(){const payload={version:"5.4.0",exportedAt:new Date().toISOString(),data:state};const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download=`${I18N.t("backupFile")}-${new Date().toISOString().slice(0,10)}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);toast(I18N.t("backupReady"))}
+function exportBackup(){const payload={version:"5.4.2",exportedAt:new Date().toISOString(),data:state};const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download=`${I18N.t("backupFile")}-${new Date().toISOString().slice(0,10)}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);toast(I18N.t("backupReady"))}
 function importBackup(file){if(!file)return;const reader=new FileReader();reader.onload=()=>{try{const payload=JSON.parse(reader.result),data=payload.data||payload;if(!Array.isArray(data.journeys)||!Array.isArray(data.fuels))throw new Error();const imported=Object.assign({},DEFAULT_STATE,data,{tach:Object.assign({},DEFAULT_STATE.tach,data.tach||{})});/* Backups made before V5.4 do not contain documents: keep current local documents instead of deleting them. */if(!Array.isArray(data.documents))imported.documents=Array.isArray(state.documents)?state.documents:[];else imported.documents=data.documents.filter(d=>d&&typeof d.name==="string"&&typeof d.expiry==="string").map(d=>Object.assign({},d,{id:d.id||uid("D"),name:d.name.trim(),reminder:DOC_REMINDER_DAYS[d.reminder]?d.reminder:"3m"}));if(!confirm(I18N.t("importConfirm")))return;localStorage.setItem(DB_KEY,JSON.stringify(imported));location.reload()}catch(e){toast(I18N.t("backupInvalid"))}finally{$("importFile").value=""}};reader.readAsText(file)}
 $("exportBtn").addEventListener("click",exportBackup);$("importFile").addEventListener("change",e=>importBackup(e.target.files[0]));
 

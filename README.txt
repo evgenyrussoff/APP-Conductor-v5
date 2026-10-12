@@ -1,7 +1,9 @@
-APLICACIÓN PARA CONDUCTOR V5.4.1.0
+APLICACIÓN PARA CONDUCTOR V5.4.2.0
 ================================
 
-NOVEDADES V5.4.1
+NOVEDADES V5.4.2
+- Corregido el cálculo semanal y bisemanal al cruzar de domingo a lunes: la lectura manual conserva la semana actual y la anterior solo mientras pertenecen a la ventana bisemanal; la semana más antigua deja de contar al cambiar la semana.
+- El total bisemanal se calcula como la suma de las dos semanas lunes-domingo vigentes, siguiendo el enfoque de la versión comparada del compañero.
 --------------
 - Nuevo acceso «Caducidades», situado a la izquierda de «Registro Repostajes».
 - Apartado de documentos integrado en la propia aplicación y guardado en el mismo almacenamiento local del dispositivo.
@@ -19,8 +21,8 @@ INSTALACIÓN / ACTUALIZACIÓN
 ---------------------------
 1. Haz una copia de seguridad desde Ajustes antes de actualizar.
 2. Sustituye en GitHub Pages los archivos por todos los archivos de esta versión, manteniendo los nombres y la estructura.
-3. Abre la aplicación con conexión a Internet para que se descarguen los archivos nuevos. Si el iPhone sigue mostrando la versión anterior, cierra la PWA por completo y vuelve a abrirla; el service worker de V5.4.1 tiene una caché nueva.
-4. Los documentos se guardan en el mismo almacenamiento local que las jornadas y repostajes. Para conservarlos al cambiar de dispositivo, utiliza la copia de seguridad general de V5.4.1.
+3. Abre la aplicación con conexión a Internet para que se descarguen los archivos nuevos. Si el iPhone sigue mostrando la versión anterior, cierra la PWA por completo y vuelve a abrirla; el service worker de V5.4.2 tiene una caché nueva.
+4. Los documentos se guardan en el mismo almacenamiento local que las jornadas y repostajes. Para conservarlos al cambiar de dispositivo, utiliza la copia de seguridad general de V5.4.2.
 
 IMPORTANTE
 ----------
@@ -139,3 +141,6 @@ CAMBIOS V5.3.3
 
 
 Correcciones V5.4.1: tarjeta de próxima caducidad, botón + Añadir al crear documentos, mejora del enfoque/zoom móvil, aviso al alcanzar el límite semanal, ajuste del campo fecha de repostaje y mejora de preconexión para Restricciones para Camiones.
+
+
+Correcciones V5.4.2: cálculo semanal y bisemanal con ventana móvil de dos semanas y caducidad de la parte más antigua de una lectura manual al cruzar el lunes.
