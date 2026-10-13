@@ -114,12 +114,18 @@
           <article><small id="statConsumptionLabel">Consumo medio</small><strong id="avgConsumption">— L/100 km</strong></article>
         </div>
         <button id="consumptionHistoryBtn" class="secondary-action wide consumption-history-btn" type="button">⛽ Consumo medio de combustible · Meses y años</button>
+        <button id="kilometresHistoryBtn" class="secondary-action wide consumption-history-btn" type="button">🚚 Kilómetros recorridos · Meses y años</button>
       </div>
     </section>
 
     <section id="consumptionHistoryScreen" class="screen">
       <header class="page-head"><button id="consumptionHistoryBack" class="back" type="button">←</button><h1 id="consumptionHistoryTitle">Consumo medio de combustible</h1></header>
       <div class="history-wrap"><p class="note" id="consumptionHistoryNote">Cálculo mensual por periodos naturales, del día 1 al último día de cada mes. Se utilizan intervalos entre repostajes con depósito lleno.</p><div id="consumptionHistoryList"></div></div>
+    </section>
+
+    <section id="kilometresHistoryScreen" class="screen">
+      <header class="page-head"><button id="kilometresHistoryBack" class="back" type="button">←</button><h1 id="kilometresHistoryTitle">Kilómetros recorridos</h1></header>
+      <div class="history-wrap"><p class="note" id="kilometresHistoryNote">Kilómetros por periodos mensuales configurados, del día 26 al día 25.</p><div id="kilometresHistoryList"></div></div>
     </section>
 
     <section id="historyScreen" class="screen">

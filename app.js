@@ -17,7 +17,7 @@ function show(id){document.querySelectorAll(".screen").forEach(s=>s.classList.re
 function backHome(){show("home")}
 function backHistory(){if(window.__journeyDetailSource==="calendar"){renderTach();show("tachScreen");return}renderHistory();show("historyScreen")}
 document.querySelectorAll("[data-back]").forEach(b=>b.addEventListener("click",backHome));
-let swipeStartX=0,swipeStartY=0;document.addEventListener("touchstart",e=>{const t=e.touches[0];swipeStartX=t.clientX;swipeStartY=t.clientY},{passive:true});document.addEventListener("touchend",e=>{const t=e.changedTouches[0],dx=t.clientX-swipeStartX,dy=t.clientY-swipeStartY;if(swipeStartX<=25&&dx>=70&&Math.abs(dx)>Math.abs(dy)*1.3){const active=document.querySelector(".screen.active");if(active&&active.id!=="home"){if(active.id==="journeyDetailScreen")backHistory();else if(active.id==="consumptionHistoryScreen")show("statsScreen");else backHome();}}},{passive:true});
+let swipeStartX=0,swipeStartY=0;document.addEventListener("touchstart",e=>{const t=e.touches[0];swipeStartX=t.clientX;swipeStartY=t.clientY},{passive:true});document.addEventListener("touchend",e=>{const t=e.changedTouches[0],dx=t.clientX-swipeStartX,dy=t.clientY-swipeStartY;if(swipeStartX<=25&&dx>=70&&Math.abs(dx)>Math.abs(dy)*1.3){const active=document.querySelector(".screen.active");if(active&&active.id!=="home"){if(active.id==="journeyDetailScreen")backHistory();else if(active.id==="consumptionHistoryScreen"||active.id==="kilometresHistoryScreen")show("statsScreen");else backHome();}}},{passive:true});
 function initSelects(){for(let i=0;i<=24;i++){$("driveHours").insertAdjacentHTML("beforeend",`<option value="${i}">${i} ${I18N.t("hours")}</option>`);$("editDriveHours").insertAdjacentHTML("beforeend",`<option value="${i}">${i} ${I18N.t("hours")}</option>`)}for(let i=0;i<60;i++){$("driveMinutes").insertAdjacentHTML("beforeend",`<option value="${i}">${String(i).padStart(2,"0")} ${I18N.t("minutes")}</option>`);$("editDriveMinutes").insertAdjacentHTML("beforeend",`<option value="${i}">${String(i).padStart(2,"0")} ${I18N.t("minutes")}</option>`)} }
 function setNow(id){$(id).value=nowLocalInput()}
 document.querySelectorAll("[data-now]").forEach(b=>b.addEventListener("click",()=>setNow(b.dataset.now)));
@@ -190,6 +190,8 @@ $("fuelForm").addEventListener("submit",e=>{e.preventDefault();const btn=$("fuel
 
 function resetLocalData(area){if(state.journeys.some(j=>j.status==="OPEN")){toast(I18N.t("resetWhileOpen"));return}if(!confirm(I18N.t("resetConfirm",{area:area})))return;const now=new Date().toISOString();if(area==="historial")state.resetHistoryAt=now;else state.resetStatsAt=now;saveState();renderStats();renderHistory();toast(I18N.t("resetDone",{area:area.charAt(0).toUpperCase()+area.slice(1)}))}
 $("consumptionHistoryBtn").addEventListener("click",()=>{renderConsumptionHistory();show("consumptionHistoryScreen")});
+$("kilometresHistoryBtn").addEventListener("click",()=>{renderKilometresHistory();show("kilometresHistoryScreen")});
+$("kilometresHistoryBack").addEventListener("click",()=>show("statsScreen"));
 function consumptionIntervals(){
   const fuels=visibleFuels().slice().sort((a,b)=>fuelDateForDisplay(a).localeCompare(fuelDateForDisplay(b))||new Date(a.date)-new Date(b.date));
   const full=fuels.map((f,i)=>({f,i})).filter(x=>x.f.full);const intervals=[];
@@ -223,6 +225,18 @@ function renderConsumptionHistory(){
     html+=`<details class="history-year" ${y===String(new Date().getFullYear())?"open":""}><summary><span>▼ ${y}</span><b>${yearValue}</b></summary><div class="consumption-year-body">${rows}</div></details>`;
   }
   list.innerHTML=html||`<div class="settings-card">${I18N.t("noFuels")}</div>`;
+}
+function renderKilometresHistory(){
+  const list=$("kilometresHistoryList");if(!list)return;
+  const byPeriod=new Map();
+  for(const j of completedJourneys()){
+    const d=new Date(j.endDate||j.startDate);if(isNaN(d))continue;
+    const p=monthPeriod(d),key=localDateString(p.start);
+    if(!byPeriod.has(key))byPeriod.set(key,{start:p.start,end:p.end,km:0,journeys:0});
+    const item=byPeriod.get(key);item.km+=Number(j.kmDay)||0;item.journeys++;
+  }
+  const rows=[...byPeriod.values()].sort((a,b)=>b.start-a.start);
+  list.innerHTML=rows.length?rows.map(x=>`<div class="consumption-month-row"><strong>${x.start.toLocaleDateString(I18N.lang,{day:"2-digit",month:"short",year:"numeric"})} – ${x.end.toLocaleDateString(I18N.lang,{day:"2-digit",month:"short",year:"numeric"})}</strong><span>${x.km.toLocaleString(I18N.lang)} km</span><small>${x.journeys} ${x.journeys===1?"jornada cerrada":"jornadas cerradas"}</small></div>`).join(""):`<div class="settings-card">Todavía no hay jornadas cerradas para mostrar kilómetros.</div>`;
 }
 function renderStats(){const p=monthPeriod();$("periodLabel").textContent=`${p.start.toLocaleDateString(I18N.lang)} → ${p.end.toLocaleDateString(I18N.lang)}`;const closed=completedJourneys(),inMonth=closed.filter(j=>{const d=new Date(j.endDate||j.startDate);return d>=p.start&&d<=p.end});const monthKm=inMonth.reduce((s,j)=>s+(j.kmDay||0),0),totalKm=closed.reduce((s,j)=>s+(j.kmDay||0),0),speedKm=closed.reduce((s,j)=>s+(j.kmDay||0),0),drive=closed.reduce((s,j)=>s+(j.driveMin||0),0);$("monthKm").textContent=`${monthKm.toLocaleString(I18N.lang)} km`;$("totalKm").textContent=`${totalKm.toLocaleString(I18N.lang)} km`;$("yearKm").textContent=`${yearKm().toLocaleString(I18N.lang)} km`;$("avgSpeed").textContent=drive?`${(speedKm/(drive/60)).toFixed(1)} ${I18N.t("speedUnit")}`:"0 km/h";$("avgConsumption").textContent=calcOverallConsumption()??"— L/100 km"}
 function historyMetricClass(type,minutes){
