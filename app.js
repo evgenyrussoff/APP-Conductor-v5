@@ -327,7 +327,7 @@ function recalculateTachograph(persist=true){
   const initialReduced=(base&&!isNaN(base)&&weekKeyFromDate(base)===weekKeyFromDate(current))?Number(t.initialReducedDailySnapshot||0):0;
   const reduced=Math.min(3,initialReduced+reducedDailyFromApp());t.reducedDailyUsed=reduced;
   t.pendingCompMin=(t.weeklyRests||[]).reduce((sum,r)=>sum+(Number(r.compMin)||0),0);
-  t.lastRecalculatedAt=now.toISOString();t.calcVersion="5.4.3";
+  t.lastRecalculatedAt=now.toISOString();t.calcVersion="5.4.5";
   if(persist)localStorage.setItem(DB_KEY,JSON.stringify(state));
   return {currentTotal,previousTotal,biweeklyTotal:calculatedBiweekly};
 }
@@ -391,13 +391,16 @@ function renderTachAlerts(weekTotal,biTotal,ten,red,lastRest){
   else alerts.push(["warn",`🟡 ${I18N.t("alertNoWeeklyRestData")}`]);
   box.innerHTML=alerts.length?alerts.map(a=>`<div class="tach-alert ${a[0]}">${a[1]}</div>`).join(""):`<div class="tach-alert good">🟢 ${I18N.t("alertAllGood")}</div>`
 }
+function calendarDateForJourney(j){return j&&j.endDate?new Date(j.endDate):new Date(j&&j.startDate)}
 function renderWeekCalendar(ws){
   syncJourneyPauses();
   const box=$("weekCalendar");if(!box)return;const names=["L","M","X","J","V","S","D"];let html=`<div class="week-calendar-head">${names.map(n=>`<span>${n}</span>`).join("")}</div><div class="week-calendar-grid">`;
   const journeys=completedJourneys();
   for(let i=0;i<7;i++){
-    const day=addDays(ws,i),next=addDays(day,1),items=journeys.filter(j=>{const d=journeyDateForWeek(j);return d>=day&&d<next});
-    // Driving belongs to the journey start day. A pause belongs to the day
+    const day=addDays(ws,i),next=addDays(day,1),items=journeys.filter(j=>{const d=calendarDateForJourney(j);return d>=day&&d<next});
+    // For calendar display only, assign a completed journey to its closing day.
+    // The full journey duration is shown there; exact daily driving split is not recorded.
+    // Tachograph weekly calculations continue to use journeyDateForWeek(). A pause belongs to the day
     // on which the previous journey actually ended (when the rest begins).
     // This makes the overnight rest visible immediately in the correct square.
     const chronological=state.journeys
@@ -424,7 +427,7 @@ function renderWeekCalendar(ws){
     html+=`<button type="button" class="calendar-day" data-calendar-day="${day.toISOString()}"><strong>${names[i]}</strong><small>${day.getDate()}</small><span class="calendar-icon">🚛</span><b class="${driveCls}">${drive?minsToClock(drive):"—"}</b><span class="calendar-icon">🕐</span><b class="${pauseCls}">${pause?minsToClock(pause):"—"}</b></button>`;
   }
   $("weekCalendarRange").textContent=weekLabel(ws);html+=`</div><div class="calendar-legend"><span>🚛 = ${I18N.t("calendarDrive")}</span><span>🕐 = ${I18N.t("calendarPause")}</span></div>`;box.innerHTML=html;
-  box.querySelectorAll("[data-calendar-day]").forEach(b=>b.addEventListener("click",()=>{const d=new Date(b.dataset.calendarDay);const j=completedJourneys().find(x=>{const q=journeyDateForWeek(x);return q>=d&&q<addDays(d,1)});if(j)openJourneyDetail(j.id,"calendar")}))
+  box.querySelectorAll("[data-calendar-day]").forEach(b=>b.addEventListener("click",()=>{const d=new Date(b.dataset.calendarDay);const j=completedJourneys().find(x=>{const q=calendarDateForJourney(x);return q>=d&&q<addDays(d,1)});if(j)openJourneyDetail(j.id,"calendar")}))
 }
 function tachRestTouchingDay(day){const next=addDays(day,1);return (state.tach.weeklyRests||[]).some(r=>new Date(r.start)<next&&new Date(r.end)>day)}
 function renderWeeklyRests(){const rows=(state.tach.weeklyRests||[]).slice().sort((a,b)=>new Date(b.start)-new Date(a.start));$("weeklyRestList").innerHTML=rows.map(r=>`<div class="rest-row"><strong>${formatDate(r.start)} → ${formatDate(r.end)}</strong><small>${r.reduced?I18N.t("reducedRest"):I18N.t("normalRest")} · ${minsToLong(r.minutes)}${r.outsideSpain?" · 🇪🇺 "+I18N.t("outsideSpain"):""}${r.compMin?` · ${minsToLong(r.compMin)} ${I18N.t("compHours")}`:""}${r.source==="auto"?" · ⚙️":""}</small></div>`).join("")||`<p>${I18N.t("noRest")}</p>`}
@@ -435,7 +438,7 @@ function updateUI(){const open=state.journeys.find(j=>j.status==="OPEN"),lastClo
 function updateJourneyTimer(){const open=state.journeys.find(j=>j.status==="OPEN");const card=$("journeyTimer");if(!card)return;if(open){const mins=Math.max(0,Math.round((Date.now()-new Date(open.startDate))/60000));card.textContent=`${I18N.t("journeyDuration")}: ${minsToClock(mins)} h`;card.classList.add("running")}else{const last=state.journeys.filter(j=>j.status==="CLOSED"&&j.endDate).sort((a,b)=>new Date(b.endDate)-new Date(a.endDate))[0];const mins=last?Math.max(0,Math.round((Date.now()-new Date(last.endDate))/60000)):0;card.textContent=`${I18N.t("pauseSinceLast")}: ${String(Math.floor(mins/60)).padStart(3,"0")}:${String(mins%60).padStart(2,"0")} h (${(mins/1440).toFixed(1)} ${I18N.t("daysUnit")})`;card.classList.remove("running")}}
 setInterval(()=>{updateJourneyTimer();const active=document.querySelector("#home.active");if(active)updateUI()},1000);
 
-function exportBackup(){const payload={version:"5.4.3",exportedAt:new Date().toISOString(),data:state};const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download=`${I18N.t("backupFile")}-${new Date().toISOString().slice(0,10)}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);toast(I18N.t("backupReady"))}
+function exportBackup(){const payload={version:"5.4.5",exportedAt:new Date().toISOString(),data:state};const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download=`${I18N.t("backupFile")}-${new Date().toISOString().slice(0,10)}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);toast(I18N.t("backupReady"))}
 function importBackup(file){if(!file)return;const reader=new FileReader();reader.onload=()=>{try{const payload=JSON.parse(reader.result),data=payload.data||payload;if(!Array.isArray(data.journeys)||!Array.isArray(data.fuels))throw new Error();const imported=Object.assign({},DEFAULT_STATE,data,{tach:Object.assign({},DEFAULT_STATE.tach,data.tach||{})});/* Backups made before V5.4 do not contain documents: keep current local documents instead of deleting them. */if(!Array.isArray(data.documents))imported.documents=Array.isArray(state.documents)?state.documents:[];else imported.documents=data.documents.filter(d=>d&&typeof d.name==="string"&&typeof d.expiry==="string").map(d=>Object.assign({},d,{id:d.id||uid("D"),name:d.name.trim(),reminder:DOC_REMINDER_DAYS[d.reminder]?d.reminder:"3m"}));if(!confirm(I18N.t("importConfirm")))return;localStorage.setItem(DB_KEY,JSON.stringify(imported));location.reload()}catch(e){toast(I18N.t("backupInvalid"))}finally{$("importFile").value=""}};reader.readAsText(file)}
 $("exportBtn").addEventListener("click",exportBackup);$("importFile").addEventListener("change",e=>importBackup(e.target.files[0]));
 

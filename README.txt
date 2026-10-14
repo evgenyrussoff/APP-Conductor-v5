@@ -1,7 +1,7 @@
-APLICACIÓN PARA CONDUCTOR V5.4.4
+APLICACIÓN PARA CONDUCTOR V5.4.5
 ================================
 
-CAMBIOS V5.4.4
+CAMBIOS V5.4.5
 --------------
 - En Control Tacógrafo, las conducciones semanal y bisemanal aparecen en tarjetas contiguas.
 - Nueva tarjeta «Horas de conducción disponibles»: muestra el menor entre el tiempo restante hasta 56:00 h semanales y 90:00 h bisemanales.
@@ -10,7 +10,8 @@ CAMBIOS V5.4.4
 - En Caducidades, el botón de la lista es «+ Añadir» y abre el formulario. Dentro del formulario, el botón de acción se llama «Guardar».
 - Ajustado el ancho del campo «Fecha del repostaje» para que coincida con los demás campos y no llegue al borde de la pantalla.
 - Optimizado camion.jpg de 1.204.555 bytes a aproximadamente 366.676 bytes, conservando el nombre del archivo y ajustando la imagen a 1280 × 1707 píxeles.
-- Renovada la caché del service worker para que el dispositivo descargue los archivos de V5.4.4.
+- Corregido el Calendario semanal: las jornadas cerradas que cruzan medianoche se muestran en el día de cierre, manteniendo intactos los cálculos del Control Tacógrafo. El tiempo mostrado es el total de la jornada y no un reparto diario exacto.
+- Renovada la caché del service worker para que el dispositivo descargue los archivos de V5.4.5.
 
 INSTALACIÓN / ACTUALIZACIÓN
 ---------------------------
@@ -148,3 +149,6 @@ Correcciones V5.4.1: tarjeta de próxima caducidad, botón + Añadir al crear do
 Correcciones V5.4.2: cálculo semanal y bisemanal con ventana móvil de dos semanas y caducidad de la parte más antigua de una lectura manual al cruzar el lunes.
 
 V5.4.4: añadido historial de kilómetros por periodos mensuales configurados (por defecto del día 26 al 25), independiente de las estadísticas de consumo.
+
+
+V5.4.5: el Calendario semanal muestra la conducción de las jornadas cerradas en el día de cierre cuando cruzan medianoche. No modifica el cálculo semanal/bisemanal del Control Tacógrafo ni los datos guardados.

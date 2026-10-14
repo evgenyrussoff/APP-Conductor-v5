@@ -1,4 +1,4 @@
-const CACHE="truck-work-log-v25-v5-4-4";
+const CACHE="truck-work-log-v25-v5-4-5";
 const ASSETS=["./","./index.html","./style.css","./app.js","./i18n.js","./config.js","./manifest.json","./manifest-es.json","./manifest-pt.json","./manifest-ro.json","./manifest-en.json","./manifest-fr.json","./manifest-it.json","./manifest-de.json","./icon.svg","./icon-192.png","./icon-512.png","./camion.jpg"];
 self.addEventListener("install",e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)).then(()=>self.skipWaiting())));
 self.addEventListener("activate",e=>e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
