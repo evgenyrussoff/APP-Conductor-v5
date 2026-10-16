@@ -327,7 +327,7 @@ function recalculateTachograph(persist=true){
   const initialReduced=(base&&!isNaN(base)&&weekKeyFromDate(base)===weekKeyFromDate(current))?Number(t.initialReducedDailySnapshot||0):0;
   const reduced=Math.min(3,initialReduced+reducedDailyFromApp());t.reducedDailyUsed=reduced;
   t.pendingCompMin=(t.weeklyRests||[]).reduce((sum,r)=>sum+(Number(r.compMin)||0),0);
-  t.lastRecalculatedAt=now.toISOString();t.calcVersion="5.4.5";
+  t.lastRecalculatedAt=now.toISOString();t.calcVersion="5.4.7";
   if(persist)localStorage.setItem(DB_KEY,JSON.stringify(state));
   return {currentTotal,previousTotal,biweeklyTotal:calculatedBiweekly};
 }
@@ -391,15 +391,31 @@ function renderTachAlerts(weekTotal,biTotal,ten,red,lastRest){
   else alerts.push(["warn",`🟡 ${I18N.t("alertNoWeeklyRestData")}`]);
   box.innerHTML=alerts.length?alerts.map(a=>`<div class="tach-alert ${a[0]}">${a[1]}</div>`).join(""):`<div class="tach-alert good">🟢 ${I18N.t("alertAllGood")}</div>`
 }
-function calendarDateForJourney(j){return j&&j.endDate?new Date(j.endDate):new Date(j&&j.startDate)}
+function calendarDateForJourney(j){
+  const start=new Date(j&&j.startDate),end=new Date(j&&j.endDate||j&&j.startDate);
+  if(isNaN(start)||isNaN(end)||end<=start)return new Date(j&&j.startDate||j&&j.endDate);
+  // Calendar-only rule: assign the entire journey to the local calendar day
+  // containing the greatest share of its elapsed duration. If shares tie,
+  // keep the start day. This is an estimate of duration, not actual driving time.
+  let cursor=new Date(start),bestDay=new Date(start.getFullYear(),start.getMonth(),start.getDate()),bestMs=-1;
+  while(cursor<end){
+    const dayStart=new Date(cursor.getFullYear(),cursor.getMonth(),cursor.getDate());
+    const nextMidnight=new Date(dayStart);nextMidnight.setDate(nextMidnight.getDate()+1);
+    const segmentEnd=new Date(Math.min(end.getTime(),nextMidnight.getTime()));
+    const share=segmentEnd.getTime()-cursor.getTime();
+    if(share>bestMs){bestMs=share;bestDay=dayStart;}
+    cursor=segmentEnd;
+  }
+  return bestDay;
+}
 function renderWeekCalendar(ws){
   syncJourneyPauses();
   const box=$("weekCalendar");if(!box)return;const names=["L","M","X","J","V","S","D"];let html=`<div class="week-calendar-head">${names.map(n=>`<span>${n}</span>`).join("")}</div><div class="week-calendar-grid">`;
   const journeys=completedJourneys();
   for(let i=0;i<7;i++){
     const day=addDays(ws,i),next=addDays(day,1),items=journeys.filter(j=>{const d=calendarDateForJourney(j);return d>=day&&d<next});
-    // For calendar display only, assign a completed journey to its closing day.
-    // The full journey duration is shown there; exact daily driving split is not recorded.
+    // For calendar display only, assign the full journey to the local day with the greatest share of elapsed duration.
+    // The full journey driving total is shown on that day; actual driving minutes per day are not recorded.
     // Tachograph weekly calculations continue to use journeyDateForWeek(). A pause belongs to the day
     // on which the previous journey actually ended (when the rest begins).
     // This makes the overnight rest visible immediately in the correct square.
@@ -438,7 +454,7 @@ function updateUI(){const open=state.journeys.find(j=>j.status==="OPEN"),lastClo
 function updateJourneyTimer(){const open=state.journeys.find(j=>j.status==="OPEN");const card=$("journeyTimer");if(!card)return;if(open){const mins=Math.max(0,Math.round((Date.now()-new Date(open.startDate))/60000));card.textContent=`${I18N.t("journeyDuration")}: ${minsToClock(mins)} h`;card.classList.add("running")}else{const last=state.journeys.filter(j=>j.status==="CLOSED"&&j.endDate).sort((a,b)=>new Date(b.endDate)-new Date(a.endDate))[0];const mins=last?Math.max(0,Math.round((Date.now()-new Date(last.endDate))/60000)):0;card.textContent=`${I18N.t("pauseSinceLast")}: ${String(Math.floor(mins/60)).padStart(3,"0")}:${String(mins%60).padStart(2,"0")} h (${(mins/1440).toFixed(1)} ${I18N.t("daysUnit")})`;card.classList.remove("running")}}
 setInterval(()=>{updateJourneyTimer();const active=document.querySelector("#home.active");if(active)updateUI()},1000);
 
-function exportBackup(){const payload={version:"5.4.5",exportedAt:new Date().toISOString(),data:state};const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download=`${I18N.t("backupFile")}-${new Date().toISOString().slice(0,10)}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);toast(I18N.t("backupReady"))}
+function exportBackup(){const payload={version:"5.4.7",exportedAt:new Date().toISOString(),data:state};const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download=`${I18N.t("backupFile")}-${new Date().toISOString().slice(0,10)}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);toast(I18N.t("backupReady"))}
 function importBackup(file){if(!file)return;const reader=new FileReader();reader.onload=()=>{try{const payload=JSON.parse(reader.result),data=payload.data||payload;if(!Array.isArray(data.journeys)||!Array.isArray(data.fuels))throw new Error();const imported=Object.assign({},DEFAULT_STATE,data,{tach:Object.assign({},DEFAULT_STATE.tach,data.tach||{})});/* Backups made before V5.4 do not contain documents: keep current local documents instead of deleting them. */if(!Array.isArray(data.documents))imported.documents=Array.isArray(state.documents)?state.documents:[];else imported.documents=data.documents.filter(d=>d&&typeof d.name==="string"&&typeof d.expiry==="string").map(d=>Object.assign({},d,{id:d.id||uid("D"),name:d.name.trim(),reminder:DOC_REMINDER_DAYS[d.reminder]?d.reminder:"3m"}));if(!confirm(I18N.t("importConfirm")))return;localStorage.setItem(DB_KEY,JSON.stringify(imported));location.reload()}catch(e){toast(I18N.t("backupInvalid"))}finally{$("importFile").value=""}};reader.readAsText(file)}
 $("exportBtn").addEventListener("click",exportBackup);$("importFile").addEventListener("change",e=>importBackup(e.target.files[0]));
 
