@@ -1,8 +1,9 @@
-APLICACIÓN PARA CONDUCTOR V5.4.7
+APLICACIÓN PARA CONDUCTOR V5.4.8
 ================================
 
-CAMBIOS V5.4.7
+CAMBIOS V5.4.8
 --------------
+- Corregido el Calendario semanal para que el descanso entre una jornada cerrada y la siguiente se agrupe con la jornada anterior, usando el mismo día asignado por la regla de mayoría de duración. Aunque el descanso empiece después de medianoche, aparece junto a la conducción de esa jornada. Los tiempos originales y los cálculos del Control Tacógrafo no cambian.
 - En Control Tacógrafo, las conducciones semanal y bisemanal aparecen en tarjetas contiguas.
 - Nueva tarjeta «Horas de conducción disponibles»: muestra el menor entre el tiempo restante hasta 56:00 h semanales y 90:00 h bisemanales.
 - Eliminado el botón manual «Recalcular». El control sigue actualizando sus cálculos al abrir la pantalla y al actualizar los datos.
@@ -11,7 +12,7 @@ CAMBIOS V5.4.7
 - Ajustado el ancho del campo «Fecha del repostaje» para que coincida con los demás campos y no llegue al borde de la pantalla.
 - Optimizado camion.jpg de 1.204.555 bytes a aproximadamente 366.676 bytes, conservando el nombre del archivo y ajustando la imagen a 1280 × 1707 píxeles.
 - Corregido el Calendario semanal: las jornadas cerradas que cruzan medianoche se asignan al día en el que transcurre la mayor parte de su duración. El tiempo mostrado es el total de la jornada y no un reparto diario exacto. Los cálculos del Control Tacógrafo permanecen intactos.
-- Renovada la caché del service worker para que el dispositivo descargue los archivos de V5.4.7.
+- Renovada la caché del service worker para que el dispositivo descargue los archivos de V5.4.8.
 
 INSTALACIÓN / ACTUALIZACIÓN
 ---------------------------
@@ -151,4 +152,4 @@ Correcciones V5.4.2: cálculo semanal y bisemanal con ventana móvil de dos sema
 V5.4.4: añadido historial de kilómetros por periodos mensuales configurados (por defecto del día 26 al 25), independiente de las estadísticas de consumo.
 
 
-V5.4.7: el Calendario semanal asigna las jornadas que cruzan medianoche al día que contiene la mayor parte de su duración; en caso de empate, utiliza el día de inicio. El total de conducción de la jornada se muestra en ese día, sin modificar el cálculo semanal/bisemanal del Control Tacógrafo ni los datos guardados.
+V5.4.8: el Calendario semanal asigna la conducción al día que contiene la mayor parte de la duración de la jornada y agrupa con ella el descanso que viene antes de la siguiente jornada, aunque comience tras medianoche. Es una agrupación visual: no cambia los registros horarios ni los cálculos del Control Tacógrafo.

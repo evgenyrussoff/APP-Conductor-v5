@@ -425,15 +425,17 @@ function renderWeekCalendar(ws){
       // driving time for the still-open journey.
       .filter(j=>j.startDate&&((j.status==="CLOSED"&&j.endDate)||j.status==="OPEN"))
       .slice().sort((a,b)=>new Date(a.startDate)-new Date(b.startDate));
-    // Assign each break to the local calendar day on which the previous
-    // journey ended. Compare YYYY-MM-DD local keys, not Date instants, so
-    // a Sunday→Monday rest cannot spill into Monday because of timezone/UTC.
+    // Keep each rest together with the preceding work journey in the calendar.
+    // The pause is assigned to the same calendar bucket as that journey's
+    // majority-duration date, even when the rest begins after midnight.
+    // This is a display rule only; real rest timestamps remain unchanged.
     const dayKey=localDateString(day);
     const pause=chronological.reduce((sum,j,idx)=>{
       if(idx>=chronological.length-1||!j.endDate)return sum;
       const end=new Date(j.endDate),nextJourney=chronological[idx+1];
       const nextStart=new Date(nextJourney.startDate);
-      if(isNaN(end)||isNaN(nextStart)||localDateString(end)!==dayKey)return sum;
+      const assignedDay=calendarDateForJourney(j);
+      if(isNaN(end)||isNaN(nextStart)||localDateString(assignedDay)!==dayKey)return sum;
       const gap=Math.max(0,Math.round((nextStart-end)/60000));
       return sum+gap;
     },0);
