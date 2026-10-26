@@ -153,3 +153,6 @@ V5.4.4: añadido historial de kilómetros por periodos mensuales configurados (p
 
 
 V5.4.8: el Calendario semanal asigna la conducción al día que contiene la mayor parte de la duración de la jornada y agrupa con ella el descanso que viene antes de la siguiente jornada, aunque comience tras medianoche. Es una agrupación visual: no cambia los registros horarios ni los cálculos del Control Tacógrafo.
+
+
+Versión 5.4.9: cálculo de recuperaciones pendientes con cancelación de deudas completas por exceso de descansos semanales superiores a 45 horas.
