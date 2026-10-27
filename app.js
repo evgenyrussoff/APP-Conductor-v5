@@ -327,7 +327,7 @@ function recalculateTachograph(persist=true){
   const initialReduced=(base&&!isNaN(base)&&weekKeyFromDate(base)===weekKeyFromDate(current))?Number(t.initialReducedDailySnapshot||0):0;
   const reduced=Math.min(3,initialReduced+reducedDailyFromApp());t.reducedDailyUsed=reduced;
   t.pendingCompMin=recomputeWeeklyCompensations();
-  t.lastRecalculatedAt=now.toISOString();t.calcVersion="5.4.9";
+  t.lastRecalculatedAt=now.toISOString();t.calcVersion="5.5.0";
   if(persist)localStorage.setItem(DB_KEY,JSON.stringify(state));
   return {currentTotal,previousTotal,biweeklyTotal:calculatedBiweekly};
 }
@@ -416,9 +416,20 @@ function renderTachAlerts(weekTotal,biTotal,ten,red,lastRest){
 function calendarDateForJourney(j){
   const start=new Date(j&&j.startDate),end=new Date(j&&j.endDate||j&&j.startDate);
   if(isNaN(start)||isNaN(end)||end<=start)return new Date(j&&j.startDate||j&&j.endDate);
-  // Calendar-only rule: assign the entire journey to the local calendar day
-  // containing the greatest share of its elapsed duration. If shares tie,
-  // keep the start day. This is an estimate of duration, not actual driving time.
+  // If this journey starts immediately after a recorded weekly rest, keep the
+  // whole journey on its start day. This avoids moving a Monday evening shift
+  // to Tuesday merely because it finishes after midnight (e.g. 19:30–06:30).
+  // The rest record ends at the next journey's start; tolerate a one-minute
+  // difference to accommodate rounded/manual timestamps.
+  const rests=(state.tach&&state.tach.weeklyRests)||[];
+  const followsWeeklyRest=rests.some(r=>{
+    const restEnd=new Date(r.end);
+    return !isNaN(restEnd)&&Math.abs(restEnd.getTime()-start.getTime())<=60000;
+  });
+  if(followsWeeklyRest)return new Date(start.getFullYear(),start.getMonth(),start.getDate());
+  // Otherwise assign the entire journey to the local calendar day containing
+  // the greatest share of its elapsed duration. If shares tie, keep start day.
+  // This is an estimate of duration, not actual driving time.
   let cursor=new Date(start),bestDay=new Date(start.getFullYear(),start.getMonth(),start.getDate()),bestMs=-1;
   while(cursor<end){
     const dayStart=new Date(cursor.getFullYear(),cursor.getMonth(),cursor.getDate());

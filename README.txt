@@ -1,4 +1,4 @@
-APLICACIÓN PARA CONDUCTOR V5.4.8
+APLICACIÓN PARA CONDUCTOR V5.5.0
 ================================
 
 CAMBIOS V5.4.8
@@ -156,3 +156,8 @@ V5.4.8: el Calendario semanal asigna la conducción al día que contiene la mayo
 
 
 Versión 5.4.9: cálculo de recuperaciones pendientes con cancelación de deudas completas por exceso de descansos semanales superiores a 45 horas.
+
+CAMBIOS V5.5.0
+--------------
+- En Control Tacógrafo > Calendario semanal, una jornada que comienza inmediatamente después de un descanso semanal se asigna al día en que empieza, aunque termine al día siguiente y la mayor parte de su duración transcurra después de medianoche. Ejemplo: lunes 19:30 a martes 06:30 se asigna al lunes. El descanso posterior queda agrupado con esa misma jornada.
+- Los cálculos reales de conducción y los horarios registrados no se modifican; es un ajuste de presentación del calendario semanal.
