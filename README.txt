@@ -161,3 +161,21 @@ CAMBIOS V5.5.0
 --------------
 - En Control Tacógrafo > Calendario semanal, una jornada que comienza inmediatamente después de un descanso semanal se asigna al día en que empieza, aunque termine al día siguiente y la mayor parte de su duración transcurra después de medianoche. Ejemplo: lunes 19:30 a martes 06:30 se asigna al lunes. El descanso posterior queda agrupado con esa misma jornada.
 - Los cálculos reales de conducción y los horarios registrados no se modifican; es un ajuste de presentación del calendario semanal.
+
+
+CAMBIOS V5.5.1 — COPIAS DE SEGURIDAD
+-----------------------------------
+- Copia semanal automática en IndexedDB: se ejecuta en el primer arranque posterior al lunes a las 00:01. Incluye todo el histórico y conserva las 4 más recientes.
+- Copia mensual propuesta al primer arranque posterior al día 1 a las 00:01. Requiere confirmación del usuario y se conserva un máximo de 12 archivos en la carpeta elegida de Google Drive.
+- Nombre de archivo: Copia de seguridad APP Conductor (DD.MM.AAAA).json.
+- Ajustes permite crear/importar copias internas y conectar, elegir carpeta, crear e importar copias de Google Drive.
+- La aplicación nunca solicita la contraseña de Google; la autorización se realiza mediante Google Identity Services.
+- La versión aparece junto al título de la pantalla principal.
+
+CONFIGURACIÓN NECESARIA PARA GOOGLE DRIVE
+-----------------------------------------
+La integración requiere configuración del propietario antes de utilizarla: crear un proyecto en Google Cloud, habilitar Google Drive API y Google Picker API, configurar la pantalla de consentimiento OAuth y crear un OAuth Client ID tipo Web. Añadir el dominio HTTPS publicado a los orígenes JavaScript autorizados. Copiar en config.js GOOGLE_CLIENT_ID, GOOGLE_API_KEY y GOOGLE_APP_ID (número del proyecto). No publicar secretos privados; la API key debe restringirse por dominio y API.
+
+LIMITACIONES PWA
+----------------
+Una PWA no puede ejecutar tareas puntuales mientras está cerrada. Las copias automáticas se procesan al abrir la aplicación por primera vez después de la hora programada. IndexedDB permanece en el dispositivo, pero el usuario puede perderla al borrar los datos del navegador o desinstalar la PWA. Las copias de Drive requieren conexión a Internet y autorización vigente.

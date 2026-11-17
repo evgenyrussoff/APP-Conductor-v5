@@ -133,3 +133,7 @@ legend{padding:0 7px;font-weight:800;color:#145c3d}
 #fuelScreen .fuel-form,#fuelScreen .fuel-date-field{min-width:0;max-width:100%}
 #fuelScreen .fuel-date-field input[type=date]{display:block;width:86%;max-width:86%;min-width:0;box-sizing:border-box;font-size:16px;-webkit-appearance:auto}
 @media(max-width:560px){.sync-pill{margin-left:32px;max-width:calc(100vw - 170px);font-size:10px;padding:6px 8px}.next-expiring-card{padding:12px;gap:10px}.next-expiring-content strong{font-size:15px}}
+
+/* V5.5.1 - backups and version label */
+.app-version{font-size:.72em;font-weight:700;opacity:.9;white-space:nowrap}
+.backup-settings h2{margin-top:4px}.backup-settings hr{border:0;border-top:1px solid #e4ebe6;margin:18px 0}.backup-settings .wide{width:100%;margin:7px 0}.backup-status{font-size:13px;color:#52635a;background:#f1f6f3;border-radius:11px;padding:10px;margin:10px 0}.privacy-notice{font-size:13px;line-height:1.45;background:#eef7f1;border:1px solid #c9e5d2;color:#214b34;border-radius:13px;padding:12px;margin:10px 0}.backup-dialog{border:0;border-radius:18px;padding:0;width:min(92vw,420px);box-shadow:0 18px 55px #0004}.backup-dialog::backdrop{background:#101a14a6}.backup-dialog-body{padding:22px;display:grid;gap:12px}.backup-dialog h2{margin:0;color:#145c3d}.backup-dialog p{margin:0;line-height:1.45}.backup-dialog button{width:100%}
