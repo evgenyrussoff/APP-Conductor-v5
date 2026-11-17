@@ -179,3 +179,12 @@ La integración requiere configuración del propietario antes de utilizarla: cre
 LIMITACIONES PWA
 ----------------
 Una PWA no puede ejecutar tareas puntuales mientras está cerrada. Las copias automáticas se procesan al abrir la aplicación por primera vez después de la hora programada. IndexedDB permanece en el dispositivo, pero el usuario puede perderla al borrar los datos del navegador o desinstalar la PWA. Las copias de Drive requieren conexión a Internet y autorización vigente.
+
+
+V5.5.2 - Correcciones de copias de seguridad
+- Corregida la ubicación del diálogo mensual para que sus botones reciban los eventos.
+- La copia semanal y el aviso mensual no se generan hasta que existan datos reales.
+- Importación de archivos JSON desde cualquier carpeta del dispositivo.
+- Ayuda explícita para introducir solo el número de la copia interna.
+- Versión visible v5.5.2 y caché de Service Worker actualizada.
+- El aviso mensual de Google Drive solo aparece cuando Google Drive está configurado.
