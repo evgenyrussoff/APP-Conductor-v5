@@ -1,2 +1,5 @@
 # APP-Conductor-v5
-Aplicacion para guardar registros de las jornadas del trabajo para conductor de camion
+
+Aplicación para registrar jornadas de trabajo de conductores de camión.
+
+Versión 5.5.3: edición sin Google Drive, con copias de seguridad locales en IndexedDB y exportación/importación JSON.

@@ -163,28 +163,30 @@ CAMBIOS V5.5.0
 - Los cálculos reales de conducción y los horarios registrados no se modifican; es un ajuste de presentación del calendario semanal.
 
 
-CAMBIOS V5.5.1 — COPIAS DE SEGURIDAD
------------------------------------
+CAMBIOS V5.5.1 — COPIAS DE SEGURIDAD LOCALES
+-------------------------------------------
 - Copia semanal automática en IndexedDB: se ejecuta en el primer arranque posterior al lunes a las 00:01. Incluye todo el histórico y conserva las 4 más recientes.
-- Copia mensual propuesta al primer arranque posterior al día 1 a las 00:01. Requiere confirmación del usuario y se conserva un máximo de 12 archivos en la carpeta elegida de Google Drive.
 - Nombre de archivo: Copia de seguridad APP Conductor (DD.MM.AAAA).json.
-- Ajustes permite crear/importar copias internas y conectar, elegir carpeta, crear e importar copias de Google Drive.
-- La aplicación nunca solicita la contraseña de Google; la autorización se realiza mediante Google Identity Services.
+- Ajustes permite crear e importar copias internas y exportar/importar archivos JSON desde cualquier carpeta del dispositivo.
 - La versión aparece junto al título de la pantalla principal.
 
-CONFIGURACIÓN NECESARIA PARA GOOGLE DRIVE
------------------------------------------
-La integración requiere configuración del propietario antes de utilizarla: crear un proyecto en Google Cloud, habilitar Google Drive API y Google Picker API, configurar la pantalla de consentimiento OAuth y crear un OAuth Client ID tipo Web. Añadir el dominio HTTPS publicado a los orígenes JavaScript autorizados. Copiar en config.js GOOGLE_CLIENT_ID, GOOGLE_API_KEY y GOOGLE_APP_ID (número del proyecto). No publicar secretos privados; la API key debe restringirse por dominio y API.
-
-LIMITACIONES PWA
-----------------
-Una PWA no puede ejecutar tareas puntuales mientras está cerrada. Las copias automáticas se procesan al abrir la aplicación por primera vez después de la hora programada. IndexedDB permanece en el dispositivo, pero el usuario puede perderla al borrar los datos del navegador o desinstalar la PWA. Las copias de Drive requieren conexión a Internet y autorización vigente.
-
-
-V5.5.2 - Correcciones de copias de seguridad
-- Corregida la ubicación del diálogo mensual para que sus botones reciban los eventos.
-- La copia semanal y el aviso mensual no se generan hasta que existan datos reales.
+V5.5.2 — CORRECCIONES DE COPIAS DE SEGURIDAD
+--------------------------------------------
+- La copia semanal no se genera hasta que existan datos reales.
 - Importación de archivos JSON desde cualquier carpeta del dispositivo.
 - Ayuda explícita para introducir solo el número de la copia interna.
-- Versión visible v5.5.2 y caché de Service Worker actualizada.
-- El aviso mensual de Google Drive solo aparece cuando Google Drive está configurado.
+- Versión visible y caché de Service Worker actualizada.
+
+V5.5.3 — EDICIÓN SIN GOOGLE DRIVE
+---------------------------------
+- Eliminada completamente la integración con Google Drive, Google Picker y Google OAuth.
+- Eliminados de config.js el Client ID, la API Key y el número del proyecto de Google Cloud.
+- Eliminados los botones, avisos y ventanas mensuales de Google Drive.
+- Se mantiene la copia semanal automática en almacenamiento interno (IndexedDB), con un máximo de 4 copias.
+- Se mantienen la creación manual, descarga, importación desde almacenamiento interno e importación de archivos JSON desde el dispositivo.
+- Se eliminan las referencias locales guardadas por la antigua integración de Google Drive.
+- Actualizada la caché del Service Worker para forzar la carga de esta versión.
+
+LIMITACIONES DE LAS COPIAS LOCALES
+----------------------------------
+Una PWA no puede ejecutar tareas puntuales mientras está cerrada. La copia automática semanal se procesa al abrir la aplicación por primera vez después del lunes a las 00:01. IndexedDB permanece en el dispositivo, pero el usuario puede perderla al borrar los datos del navegador o desinstalar la PWA. Se recomienda descargar periódicamente una copia JSON y guardarla también en otro lugar seguro.

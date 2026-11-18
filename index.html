@@ -23,7 +23,7 @@
         <div class="brand-block">
           <div class="brand">
             <img src="icon-192.png" alt="" class="brand-icon">
-            <div><div class="brand-title">Aplicación para Conductor <span id="appVersion" class="app-version">v5.5.2</span></div><div class="brand-sub">Jornadas · Repostajes · Estadísticas</div></div>
+            <div><div class="brand-title">Aplicación para Conductor <span id="appVersion" class="app-version">v5.5.3</span></div><div class="brand-sub">Jornadas · Repostajes · Estadísticas</div></div>
           </div>
           <div class="sync-pill" id="syncStatus">📱 Datos se guardan en éste dispositivo</div>
         </div>
@@ -270,14 +270,7 @@
         <button id="importLocalBtn" type="button" class="secondary-action wide">📥 Importar desde almacenamiento interno</button>
         <button id="importDeviceBtn" type="button" class="secondary-action wide">📁 Importar copia desde el dispositivo (buscar archivo JSON)</button>
         <input id="importFile" type="file" accept=".json,application/json" hidden>
-        <hr>
-        <h2>Google Drive · Copia mensual</h2>
-        <div class="privacy-notice"><strong>🔒 Tu cuenta de Google está protegida</strong><br>La aplicación nunca solicita ni conoce tu contraseña de Google. La identificación y autorización se realizan en la página oficial de Google. Solo se utilizará el permiso concedido para gestionar las copias de seguridad.</div>
-        <p id="driveStatus" class="backup-status">Google Drive no está conectado.</p>
-        <button id="connectDriveBtn" class="secondary-action wide">🔗 Conectar Google Drive / elegir carpeta</button>
-        <button id="driveBackupBtn" class="secondary-action wide" disabled>☁️ Crear copia ahora en Google Drive</button>
-        <button id="importDriveBtn" class="secondary-action wide" disabled>📂 Importar copia desde Google Drive</button>
-        <p class="note">La copia mensual se propone el día 1 al abrir la aplicación. Se conservan las 12 copias mensuales más recientes. Para activar Google Drive, el administrador debe configurar las credenciales OAuth y API de Google Cloud en config.js.</p>
+        <p class="note">Las copias automáticas se guardan en este dispositivo. También puedes descargar una copia JSON y recuperarla desde cualquier carpeta del dispositivo.</p>
       </div>
     </section>
 
@@ -325,19 +318,7 @@
   </dialog>
         <div id="manualTachHoursOverlay" class="modal-overlay" aria-hidden="true"><div class="modal-card"><h2>⏱️ <span id="manualTachHoursTitle">Actualizar horas reales</span></h2><p id="manualTachHoursMessage">Introduce las lecturas actuales que aparecen en el tacógrafo. Estas horas serán el nuevo punto de partida de la aplicación.</p><div class="cross-week-calculated manual-tach-calculated"><div><small id="manualTachCalculatedWeeklyLabel">La aplicación tiene calculado</small><strong id="manualTachCalculatedWeekly">00:00 h</strong><span id="manualTachCalculatedWeeklyText">Conducción semanal</span></div><div><small>&nbsp;</small><strong id="manualTachCalculatedBiweekly">00:00 h</strong><span id="manualTachCalculatedBiweeklyText">Conducción bisemanal</span></div></div><p id="manualTachInstruction" class="note">Introduce los valores reales del tacógrafo:</p><div class="compact-form"><label id="manualTachWeeklyLabel">Horas semanales actuales<input id="manualTachWeekly" type="text" inputmode="numeric" placeholder="hh:mm"></label><label id="manualTachBiweeklyLabel">Horas bisemanales actuales<input id="manualTachBiweekly" type="text" inputmode="numeric" placeholder="hh:mm"></label></div><div class="form-actions"><button id="manualTachCancel" type="button" class="cancel-btn">Cancelar</button><button id="manualTachSave" type="button" class="save-btn">Actualizar datos</button></div></div></div>
   <div id="toast" class="toast"></div>
-  <dialog id="monthlyBackupDialog" class="backup-dialog">
-    <div class="backup-dialog-body">
-      <h2>☁️ Copia de seguridad mensual</h2>
-      <p>Ha llegado el momento de guardar una copia de seguridad completa en tu Google Drive.</p>
-      <p class="note">Se guardará todo tu histórico, no solo el último mes. La copia se almacenará en la carpeta de Drive que hayas elegido.</p>
-      <button id="monthlyBackupConfirm" type="button" class="save-btn">Guardar copia en Google Drive</button>
-      <button id="monthlyBackupLater" type="button" class="cancel-btn">Recordármelo más tarde</button>
-    </div>
-  </dialog>
-
-  <script src="config.js"></script>
-  <script src="https://accounts.google.com/gsi/client" async defer></script>
-  <script src="https://apis.google.com/js/api.js" async defer></script>
+<script src="config.js"></script>
   <script src="i18n.js"></script>
   <script src="app.js"></script><script>if("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js");</script>
 
