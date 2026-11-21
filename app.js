@@ -49,7 +49,7 @@ function fillInitialTachFields(empty=false){
   if(empty){$("tachWeekly").value="";$("tachBiweekly").value="";$("tachReducedDaily").value="0";$("tachTenHour").value="0";$("tachConsecutiveReduced").value="0";$("tachLastWeeklyRest").value="";$("tachLastRestType").value="45";return}
   const t=state.tach||DEFAULT_STATE.tach,ws=weekStart(new Date()),we=new Date(ws);we.setDate(we.getDate()+7);
   $("tachWeekly").value=t.weeklyDriveMin?minsToInput(t.weeklyDriveMin):"";$("tachBiweekly").value=t.biweeklyDriveMin?minsToInput(t.biweeklyDriveMin):"";
-  $("tachReducedDaily").value=Math.min(3,(t.reducedDailyUsed||0)+reducedDailyFromApp());$("tachTenHour").value=Math.min(2,(t.tenHourUsed||0)+tenHourFromApp(ws,we));$("tachConsecutiveReduced").value=t.consecutiveReducedWeekly||0;$("tachLastWeeklyRest").value=t.lastWeeklyRestEnd||"";$("tachLastRestType").value=t.lastWeeklyRestType||"45";
+  $("tachReducedDaily").value=Math.max(0,(Number(t.reducedDailyUsed)||0)+reducedDailyFromApp());$("tachTenHour").value=Math.max(0,(Number(t.tenHourUsed)||0)+tenHourFromApp(ws,we));$("tachConsecutiveReduced").value=t.consecutiveReducedWeekly||0;$("tachLastWeeklyRest").value=t.lastWeeklyRestEnd||"";$("tachLastRestType").value=t.lastWeeklyRestType||"45";
 }
 $("changeTruckBtn").addEventListener("click",()=>{truckEditMode=true;$("truckInput").value="";fillInitialTachFields(true);$("tachInitialFields").classList.remove("hidden");$("changeTruckBtn").classList.add("hidden")});
 function minsToInput(m){m=Math.max(0,Math.round(m||0));return `${String(Math.floor(m/60)).padStart(2,"0")}:${String(m%60).padStart(2,"0")}`}
@@ -88,7 +88,7 @@ $("truckForm").addEventListener("submit",e=>{
   state.truckPlate=newPlate;
   const saveTach=!oldPlate||resetAll||(!changing&&truckEditMode);
   if(saveTach){
-    state.tach.weeklyDriveMin=inputToMins($("tachWeekly").value);state.tach.weeklyDriveWeekKey=weekKey(new Date());state.tach.initialWeeklySnapshot=state.tach.weeklyDriveMin;state.tach.biweeklyDriveMin=inputToMins($("tachBiweekly").value);state.tach.biweeklyBaseAt=new Date().toISOString();state.tach.initialBiweeklySnapshot=state.tach.biweeklyDriveMin;state.tach.reducedDailyUsed=Math.min(3,Math.max(0,Number($("tachReducedDaily").value)||0));state.tach.reducedDailyBaseAt=new Date().toISOString();state.tach.initialReducedDailySnapshot=state.tach.reducedDailyUsed;state.tach.tenHourUsed=Math.min(2,Math.max(0,Number($("tachTenHour").value)||0));state.tach.tenHourWeekKey=weekKey(new Date());state.tach.initialTenHourSnapshot=state.tach.tenHourUsed;state.tach.lastWeeklyRestEnd=$("tachLastWeeklyRest").value||"";state.tach.lastWeeklyRestType=$("tachLastRestType").value||"45";state.tach.consecutiveReducedWeekly=Math.max(0,Number($("tachConsecutiveReduced").value)||0);if(state.tach.lastWeeklyRestEnd){if(state.tach.lastWeeklyRestType==="45")state.tach.consecutiveReducedWeekly=0;else state.tach.consecutiveReducedWeekly=Math.max(1,state.tach.consecutiveReducedWeekly);}state.tach.baselineAt=new Date().toISOString();state.tach.initialSetupDone=true;
+    state.tach.weeklyDriveMin=inputToMins($("tachWeekly").value);state.tach.weeklyDriveWeekKey=weekKey(new Date());state.tach.initialWeeklySnapshot=state.tach.weeklyDriveMin;state.tach.biweeklyDriveMin=inputToMins($("tachBiweekly").value);state.tach.biweeklyBaseAt=new Date().toISOString();state.tach.initialBiweeklySnapshot=state.tach.biweeklyDriveMin;state.tach.reducedDailyUsed=Math.max(0,Number($("tachReducedDaily").value)||0);state.tach.reducedDailyBaseAt=new Date().toISOString();state.tach.initialReducedDailySnapshot=state.tach.reducedDailyUsed;state.tach.tenHourUsed=Math.max(0,Number($("tachTenHour").value)||0);state.tach.tenHourWeekKey=weekKey(new Date());state.tach.initialTenHourSnapshot=state.tach.tenHourUsed;state.tach.lastWeeklyRestEnd=$("tachLastWeeklyRest").value||"";state.tach.lastWeeklyRestType=$("tachLastRestType").value||"45";state.tach.consecutiveReducedWeekly=Math.max(0,Number($("tachConsecutiveReduced").value)||0);if(state.tach.lastWeeklyRestEnd){if(state.tach.lastWeeklyRestType==="45")state.tach.consecutiveReducedWeekly=0;else state.tach.consecutiveReducedWeekly=Math.max(1,state.tach.consecutiveReducedWeekly);}state.tach.baselineAt=new Date().toISOString();state.tach.initialSetupDone=true;
   }
   saveState();
   truckEditMode=false;fillInitialTachFields(true);$("tachInitialFields").classList.add("hidden");$("changeTruckBtn").classList.remove("hidden");$("truckInput").value=state.truckPlate;
@@ -147,7 +147,7 @@ $("finishForm").addEventListener("submit",e=>{e.preventDefault();const btn=$("fi
 function isCrossWeekBoundaryJourney(j){
   if(!j||!j.startDate||!j.endDate)return false;
   const start=new Date(j.startDate),end=new Date(j.endDate);
-  return start.getDay()===0 && end.getDay()===1 && (end.getHours()>2 || (end.getHours()===2 && end.getMinutes()>=1));
+  const mon=weekStart(end);return weekStart(start)<mon && (end-mon)>2*3600000;
 }
 function openCrossWeekBaselineDialog(j){
   recalculateTachograph(true);
@@ -161,7 +161,7 @@ function openCrossWeekBaselineDialog(j){
 function closeCrossWeekModal(){ $("crossWeekModal").classList.remove("show"); }
 function applyCrossWeekBaseline(){
   const weekly=inputToMins($("crossWeekActualWeekly").value),bi=inputToMins($("crossWeekActualBiweekly").value);
-  if(!weekly||weekly>3360||!bi||bi>5400){toast(I18N.t("crossWeekInvalid"));return;}
+  if(!weekly||weekly>3360||!bi||bi>5400||bi<weekly){toast(I18N.t("crossWeekInvalid"));return;}
   const t=ensureTachMeta(),now=new Date().toISOString();
   t.crossWeekBaselineAt=now;t.baselineAt=now;t.biweeklyBaseAt=now;t.weeklyDriveMin=weekly;t.weeklyDriveWeekKey=weekKey(new Date());t.biweeklyDriveMin=bi;
   t.initialWeeklySnapshot=weekly;t.initialBiweeklySnapshot=bi;t.initialTenHourSnapshot=Number(t.tenHourUsed)||0;t.initialReducedDailySnapshot=Number(t.reducedDailyUsed)||0;t.weeklyCalc={};
@@ -177,7 +177,7 @@ function openManualTachModal(){
   if(hasOpenJourney()){toast(I18N.t("manualTachDisabled"));updateManualTachButton();return}
   const modal=$("manualTachHoursOverlay");if(!btn||!modal){toast("No se pudo abrir la ventana de actualización. Recarga la aplicación.");return}const ws=weekStart(new Date());const weekly=calcWeekTotal(ws);const biweekly=biweeklyTotal();$("manualTachCalculatedWeekly").textContent=minsToLong(weekly);$("manualTachCalculatedBiweekly").textContent=minsToLong(biweekly);$("manualTachWeekly").value="";$("manualTachBiweekly").value="";modal.classList.add("show");modal.setAttribute("aria-hidden","false");setTimeout(()=>$("manualTachWeekly")?.focus(),50)}
 function closeManualTachModal(){const modal=$("manualTachHoursOverlay");modal.classList.remove("show");modal.setAttribute("aria-hidden","true")}
-function applyManualTachBaseline(){if(hasOpenJourney()){toast(I18N.t("manualTachDisabled"));closeManualTachModal();return}const wr=$("manualTachWeekly").value.trim(),br=$("manualTachBiweekly").value.trim(),weekly=inputToMins(wr),bi=inputToMins(br);if(wr===""||br===""||weekly>3360||bi>5400){toast(I18N.t("manualTachInvalid"));return}recalculateTachograph(false);const t=ensureTachMeta(),now=new Date().toISOString();t.manualTachBaselineAt=now;t.baselineAt=now;t.biweeklyBaseAt=now;t.reducedDailyBaseAt=now;t.crossWeekBaselineAt="";t.weeklyDriveMin=weekly;t.weeklyDriveWeekKey=weekKey(new Date());t.biweeklyDriveMin=bi;t.initialWeeklySnapshot=weekly;t.initialBiweeklySnapshot=bi;t.initialTenHourSnapshot=Number(t.tenHourUsed)||0;t.initialReducedDailySnapshot=Number(t.reducedDailyUsed)||0;t.weeklyCalc={};recalculateTachograph(true);closeManualTachModal();toast(I18N.t("manualTachSaved"));renderTach()}
+function applyManualTachBaseline(){if(hasOpenJourney()){toast(I18N.t("manualTachDisabled"));closeManualTachModal();return}const wr=$("manualTachWeekly").value.trim(),br=$("manualTachBiweekly").value.trim(),weekly=inputToMins(wr),bi=inputToMins(br);if(wr===""||br===""||weekly>3360||bi>5400||bi<weekly){toast(I18N.t("manualTachInvalid"));return}recalculateTachograph(false);const t=ensureTachMeta(),now=new Date().toISOString();t.manualTachBaselineAt=now;t.baselineAt=now;t.biweeklyBaseAt=now;t.reducedDailyBaseAt=now;t.crossWeekBaselineAt="";t.weeklyDriveMin=weekly;t.weeklyDriveWeekKey=weekKey(new Date());t.biweeklyDriveMin=bi;t.initialWeeklySnapshot=weekly;t.initialBiweeklySnapshot=bi;t.initialTenHourSnapshot=Number(t.tenHourUsed)||0;t.initialReducedDailySnapshot=Number(t.reducedDailyUsed)||0;t.weeklyCalc={};recalculateTachograph(true);closeManualTachModal();toast(I18N.t("manualTachSaved"));renderTach()}
 const tachManualUpdateBtn=$("tachManualHoursBtn");
 if(tachManualUpdateBtn){
   tachManualUpdateBtn.disabled=false;
@@ -266,7 +266,7 @@ function renderHistory(){
     const minutes=Math.round((new Date(j.startDate)-new Date(prev.endDate))/60000);
     return minutes>=1440?`<div class="history-weekly-rest">Descanso semanal de ${minsToLong(minutes)}</div>`:"";
   };
-  const rowHtml=j=>{const note=j.note?` <span title="${I18N.t("incidents")}">📝</span>`:"";const avail=j.availabilityMin!=null?minsToLong(j.availabilityMin):"00:00 h";const pause=j.pauseRealizedMin!=null?minsToLong(j.pauseRealizedMin):"00:00 h";const avClass=historyMetricClass("availability",j.availabilityMin);const pauseClass=historyMetricClass("pause",j.pauseRealizedMin);return `<button class="history-row history-open" data-journey="${j.id}"><div><strong>${formatDate(j.startDate)} · ${j.status==="OPEN"?I18N.t("openStatus"):I18N.t("closedStatus")}${note}</strong><small>${j.startKm} ${I18N.t("kmUnit")} → ${j.endKm??"—"} ${I18N.t("kmUnit")} · ${j.kmDay??"—"} ${I18N.t("kmUnit")} · ${j.startPlace} · ${j.endPlace||"—"}${j.status==="CLOSED"?` · <span class="${avClass}">${I18N.t("availability")}: ${avail}</span> · <span class="${pauseClass}">${I18N.t("pauseRealizedShort")}: ${pause}</span>`:""}</small></div><span class="chevron">›</span></button>${weeklyRestMarker(j)}`};
+  const rowHtml=j=>{const note=j.note?` <span title="${I18N.t("incidents")}">📝</span>`:"";const avail=j.availabilityMin!=null?minsToLong(j.availabilityMin):"00:00 h";const pause=j.pauseRealizedMin!=null?minsToLong(j.pauseRealizedMin):"00:00 h";const avClass=historyMetricClass("availability",j.availabilityMin);const pauseClass=historyMetricClass("pause",j.pauseRealizedMin);return `<button class="history-row history-open" data-journey="${j.id}"><div><strong>${formatDate(j.startDate)} · ${j.status==="OPEN"?I18N.t("openStatus"):I18N.t("closedStatus")}${note}</strong><small>${j.startKm} ${I18N.t("kmUnit")} → ${j.endKm??"—"} ${I18N.t("kmUnit")} · ${j.kmDay??"—"} ${I18N.t("kmUnit")} · ${escapeDocHtml(j.startPlace||"—")} · ${escapeDocHtml(j.endPlace||"—")}${j.status==="CLOSED"?` · <span class="${avClass}">${I18N.t("availability")}: ${avail}</span> · <span class="${pauseClass}">${I18N.t("pauseRealizedShort")}: ${pause}</span>`:""}</small></div><span class="chevron">›</span></button>${weeklyRestMarker(j)}`};
   const monthHtml=(key,items,open)=>{const [y,m]=key.split("-").map(Number),name=new Date(y,m-1,1).toLocaleDateString(I18N.lang,{month:"long",year:"numeric"}).toUpperCase();return `<details class="history-month" ${open?"open":""}><summary><span>${open?"▼":"▶"} ${name}</span><b>${items.length}</b></summary><div class="history-month-body">${items.map(rowHtml).join("")}</div></details>`};
   let html="";for(const y of years){const months=[...groups.get(y).entries()].sort((a,b)=>b[0].localeCompare(a[0]));if(yearCount>2){const openY=y===currentYear;html+=`<details class="history-year" ${openY?"open":""}><summary><span>${openY?"▼":"▶"} ${y}</span></summary><div>${months.map(([k,items])=>monthHtml(k,items,openY&&k===months[0][0])).join("")}</div></details>`}else html+=months.map(([k,items],idx)=>monthHtml(k,items,idx===0&&y===currentYear)).join("")}
   $("historyList").innerHTML=html||`<div class="settings-card">${I18N.t("noRecords")}</div>`;
@@ -277,7 +277,7 @@ function openJourneyDetail(id,source="history"){window.__journeyDetailSource=sou
 $("consumptionHistoryBack").addEventListener("click",()=>show("statsScreen"));$("journeyDetailBack").addEventListener("click",backHistory);$("journeyDetailBackBottom").addEventListener("click",backHistory);$("journeyDetailForm").addEventListener("submit",e=>{e.preventDefault();const j=state.journeys.find(x=>x.id===$("detailJourneyId").value);if(!j)return;j.note=$("journeyNote").value.trim();saveState();toast(I18N.t("notesSaved"));backHistory()});
 
 function fuelDateForDisplay(f){return f.dateOnly||localDateString(new Date(f.date))}
-function renderFuelHistory(){const fuels=visibleFuels().slice().sort((a,b)=>new Date(b.date)-new Date(a.date));$("fuelHistoryList").innerHTML=fuels.map(f=>`<div class="fuel-history-row"><strong>${new Date(`${fuelDateForDisplay(f)}T12:00:00`).toLocaleDateString(I18N.lang)}</strong><span>${f.place}</span><span>${Number(f.km).toLocaleString(I18N.lang)} km</span><span>${Number(f.liters).toLocaleString(I18N.lang)} L</span><span>${f.full?"✓ "+I18N.t("fuelFull"):""}</span></div>`).join("")||`<div class="settings-card">${I18N.t("noFuels")}</div>`}
+function renderFuelHistory(){const fuels=visibleFuels().slice().sort((a,b)=>new Date(b.date)-new Date(a.date));$("fuelHistoryList").innerHTML=fuels.map(f=>`<div class="fuel-history-row"><strong>${new Date(`${fuelDateForDisplay(f)}T12:00:00`).toLocaleDateString(I18N.lang)}</strong><span>${escapeDocHtml(f.place||"")}</span><span>${Number(f.km).toLocaleString(I18N.lang)} km</span><span>${Number(f.liters).toLocaleString(I18N.lang)} L</span><span>${f.full?"✓ "+I18N.t("fuelFull"):""}</span></div>`).join("")||`<div class="settings-card">${I18N.t("noFuels")}</div>`}
 
 function journeyDateForWeek(j){return j&&j.startDate?new Date(j.startDate):new Date(j.endDate||j.startDate)}
 function weekDrivingFromJourneys(ws){const we=new Date(ws);we.setDate(we.getDate()+7);return completedJourneys().filter(j=>{const d=journeyDateForWeek(j);return !isNaN(d)&&d>=ws&&d<we}).reduce((s,j)=>s+(Number(j.driveMin)||0),0)}
@@ -323,11 +323,11 @@ function recalculateTachograph(persist=true){
   t.weeklyDriveMin=currentTotal;t.weeklyDriveWeekKey=weekKey(current);
   const calculatedBiweekly=biweeklyTotal();t.biweeklyDriveMin=calculatedBiweekly;t.biweeklyBaseAt=t.biweeklyBaseAt||t.baselineAt||"";
   const base=t.baselineAt?new Date(t.baselineAt):null;const initialTen=(base&&!isNaN(base)&&weekKeyFromDate(base)===weekKeyFromDate(current))?Number(t.initialTenHourSnapshot||0):0;
-  t.tenHourUsed=Math.min(2,initialTen+tenHourFromApp(current,addDays(current,7),base));t.tenHourWeekKey=weekKey(current);
-  const initialReduced=(base&&!isNaN(base)&&weekKeyFromDate(base)===weekKeyFromDate(current))?Number(t.initialReducedDailySnapshot||0):0;
-  const reduced=Math.min(3,initialReduced+reducedDailyFromApp());t.reducedDailyUsed=reduced;
+  t.tenHourUsed=initialTen+tenHourFromApp(current,addDays(current,7),base);t.tenHourWeekKey=weekKey(current);
+  const lastRestD=t.lastWeeklyRestEnd?new Date(t.lastWeeklyRestEnd):null;const initialReduced=(base&&!isNaN(base)&&!(lastRestD&&!isNaN(lastRestD)&&lastRestD>base))?Number(t.initialReducedDailySnapshot||0):0;
+  const reduced=initialReduced+reducedDailyFromApp();t.reducedDailyUsed=reduced;
   t.pendingCompMin=recomputeWeeklyCompensations();
-  t.lastRecalculatedAt=now.toISOString();t.calcVersion="5.5.0";
+  t.lastRecalculatedAt=now.toISOString();t.calcVersion="5.5.4";
   if(persist)localStorage.setItem(DB_KEY,JSON.stringify(state));
   return {currentTotal,previousTotal,biweeklyTotal:calculatedBiweekly};
 }
@@ -347,10 +347,10 @@ function recomputeWeeklyCompensations(){
     r.compMin=generated;
     if(generated>0){debts.push(r);continue;}
     let excess=Math.max(0,minutes-2700);
-    while(excess>0&&debts.length){
-      const oldest=debts[0],owed=Number(oldest.compMin)||0;
-      if(owed<=excess){excess-=owed;oldest.compMin=0;debts.shift();}
-      else break; // never cancel part of a weekly debt
+    for(let k=0;k<debts.length&&excess>0;){
+      const owed=Number(debts[k].compMin)||0;
+      if(owed<=excess){excess-=owed;debts[k].compMin=0;debts.splice(k,1);}
+      else k++; // una deuda nunca se parte; otra más pequeña sí puede saldarse
     }
   }
   t.pendingCompMin=rests.reduce((sum,r)=>sum+(Number(r.compMin)||0),0);
@@ -379,7 +379,7 @@ function reducedDailyFromApp(){
     // a 9–11 h rest is also recognized without double-counting that shift.
     if(j.reducedDailyAutoCounted||availability>780||(gap!==null&&gap>=540&&gap<660))count++;
   }
-  return Math.min(3,count);
+  return count;
 }
 function biweeklyTotal(){
   // A biweekly total is always the sum of the current Monday-Sunday week and
@@ -390,12 +390,12 @@ function biweeklyTotal(){
   return calcWeekTotal(ws)+calcWeekTotal(previous);
 }
 function renderTach(){
-  recalculateTachograph(true);const t=ensureTachMeta(),ws=weekStart(new Date()),we=addDays(ws,7),weekTotal=calcWeekTotal(ws),biTotal=biweeklyTotal(),ten=Math.min(2,Number(t.tenHourUsed)||0),red=Math.min(3,Number(t.reducedDailyUsed)||0),latestRest=t.weeklyRests.slice().sort((a,b)=>new Date(b.end)-new Date(a.end))[0];
+  recalculateTachograph(true);const t=ensureTachMeta(),ws=weekStart(new Date()),we=addDays(ws,7),weekTotal=calcWeekTotal(ws),biTotal=biweeklyTotal(),ten=Number(t.tenHourUsed)||0,red=Number(t.reducedDailyUsed)||0,latestRest=t.weeklyRests.slice().sort((a,b)=>new Date(b.end)-new Date(a.end))[0];
   t.tenHourUsed=ten;t.reducedDailyUsed=red;updateManualTachButton();
   $("tachWeekValue").textContent=`${minsToLong(weekTotal)} / 56 h`;$("tachWeekRemaining").textContent=minsToLong(Math.max(0,3360-weekTotal));$("tachBiValue").textContent=`${minsToLong(biTotal)} / 90 h`;$("tachBiRemaining").textContent=minsToLong(Math.max(0,5400-biTotal));$("tachAvailableValue").textContent=minsToLong(Math.min(Math.max(0,3360-weekTotal),Math.max(0,5400-biTotal)));$("tachTenValue").textContent=`${ten} / 2`;$("tachTenRemaining").textContent=String(Math.max(0,2-ten));$("tachReducedValue").textContent=`${red} / 3`;$("tachReducedRemaining").textContent=String(Math.max(0,3-red));const pending=recomputeWeeklyCompensations();$("tachCompValue").textContent=pending?minsToLong(pending):I18N.t("compNone");
   const last=t.lastWeeklyRestEnd?new Date(t.lastWeeklyRestEnd):null;if(last&&!isNaN(last)){const deadline=new Date(last.getTime()+6*24*60*60*1000);if(Date.now()>=deadline.getTime()){const lang=I18N.lang||"es";const reached={es:"Límite alcanzado. Registra el descanso semanal cuando termine.",en:"Deadline reached. Record the weekly rest when it ends.",fr:"Limite atteint. Enregistrez le repos hebdomadaire à sa fin.",pt:"Limite atingido. Registe o descanso semanal quando terminar.",it:"Limite raggiunto. Registra il riposo settimanale quando termina.",de:"Frist erreicht. Wochenruhe nach Ende eintragen.",ro:"Termen atins. Înregistrează repausul săptămânal când se încheie."};$("tachWeeklyDeadline").textContent=reached[lang]||reached.es;}else{$("tachWeeklyDeadline").textContent=deadline.toLocaleString(I18N.lang,{day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit"});}}else $("tachWeeklyDeadline").textContent=I18N.t("dataIncomplete");
   renderTachAlerts(weekTotal,biTotal,ten,red,last);renderWeekCalendar(ws);
-  let statusClass="status-good",statusText=I18N.t("statusOk");if(weekTotal>3360||biTotal>5400){statusClass="status-bad";statusText=I18N.t("statusReview")}else if((3360-weekTotal)<=600||(5400-biTotal)<=600||ten>=2||red>=3){statusClass="status-warn";statusText=I18N.t("statusWarn")}else if(!(weekTotal||biTotal||t.lastWeeklyRestEnd)){statusClass="status-data";statusText=I18N.t("statusOpen")}$('tachStatus').innerHTML=`<span class="${statusClass}">${statusText}</span>`;
+  let statusClass="status-good",statusText=I18N.t("statusOk");if(weekTotal>3360||biTotal>5400||ten>2||red>3){statusClass="status-bad";statusText=I18N.t("statusReview")}else if((3360-weekTotal)<=600||(5400-biTotal)<=600||ten>=2||red>=3){statusClass="status-warn";statusText=I18N.t("statusWarn")}else if(!(weekTotal||biTotal||t.lastWeeklyRestEnd)){statusClass="status-data";statusText=I18N.t("statusOpen")}$('tachStatus').innerHTML=`<span class="${statusClass}">${statusText}</span>`;
 }
 function renderTachAlerts(weekTotal,biTotal,ten,red,lastRest){
   const box=$("tachAlerts");if(!box)return;const alerts=[];
@@ -409,6 +409,12 @@ function renderTachAlerts(weekTotal,biTotal,ten,red,lastRest){
   else if((5400-biTotal)<=600)alerts.push(["warn",`🟡 ${I18N.t("alertBiweeklySoon",{time:minsToLong(5400-biTotal)})}`]);
   if(ten>=2)alerts.push(["warn",`🟡 ${I18N.t("alertTenUsed")}`]);else if(ten===1)alerts.push(["warn",`🟡 ${I18N.t("alertTenOneLeft")}`]);
   if(red>=3)alerts.push(["bad",`🔴 ${I18N.t("alertReducedLimit")}`]);else if(red===2)alerts.push(["warn",`🟡 ${I18N.t("alertReducedOneLeft")}`]);
+  const LT=(es,en)=>(I18N.lang==="es"||!en)?es:en;
+  (state.tach.weeklyRests||[]).filter(r=>(Number(r.compMin)||0)>0).forEach(r=>{const due=new Date(addDays(weekStart(new Date(r.end)),28).getTime()-1),days=Math.ceil((due-Date.now())/864e5),h=minsToLong(r.compMin);if(days<=0)alerts.push(["bad","🔴 "+LT("Compensación de "+h+" vencida (plazo: fin de la 3.ª semana siguiente)","Compensation of "+h+" overdue (deadline: end of the 3rd following week)")]);else if(days<=7)alerts.push(["warn","🟡 "+LT("Compensación de "+h+": quedan "+days+" día(s) de plazo","Compensation of "+h+": "+days+" day(s) left")])});
+  if(ten>2)alerts.push(["bad","🔴 "+LT("Más de 2 ampliaciones de 10 h esta semana","More than 2 10-h extensions this week")]);
+  if(red>3)alerts.push(["bad","🔴 "+LT("Más de 3 descansos diarios reducidos entre descansos semanales","More than 3 reduced daily rests between weekly rests")]);
+  const wk0=weekStart(new Date()).getTime(),longJ=completedJourneys().filter(j=>weekStart(new Date(j.startDate)).getTime()===wk0&&(Number(j.availabilityMin)||0)>900).length;
+  if(longJ)alerts.push(["warn","🟡 "+LT(longJ+" jornada(s) de más de 15 h esta semana: revisa el descanso diario (mín. 9 h)",longJ+" shift(s) over 15 h this week: check the daily rest (min. 9 h)")]);
   if(lastRest){const deadline=new Date(lastRest.getTime()+6*86400000),hours=(deadline-Date.now())/3600000;if(hours<=0)alerts.push(["bad",`🔴 ${I18N.t("alertWeeklyRestOverdue")}`]);else if(hours<=24)alerts.push(["warn",`🟡 ${I18N.t("alertWeeklyRestSoon",{time:Math.ceil(hours)+" h"})}`])}
   else alerts.push(["warn",`🟡 ${I18N.t("alertNoWeeklyRestData")}`]);
   box.innerHTML=alerts.length?alerts.map(a=>`<div class="tach-alert ${a[0]}">${a[1]}</div>`).join(""):`<div class="tach-alert good">🟢 ${I18N.t("alertAllGood")}</div>`
@@ -562,7 +568,7 @@ $("documentForm").addEventListener("submit",saveDocument);
 $("documentsSearch").addEventListener("input",renderDocuments);
 
 
-// V5.5.3 — Copias de seguridad locales: IndexedDB + exportación/importación JSON.
+// V5.6.0 — Copias de seguridad locales: IndexedDB + exportación/importación JSON.
 const BACKUP_DB_NAME="appConductorBackups", BACKUP_STORE="backups";
 function backupDateStamp(d=new Date()){return `${String(d.getDate()).padStart(2,"0")}.${String(d.getMonth()+1).padStart(2,"0")}.${d.getFullYear()}`}
 function backupFilename(d=new Date()){return `Copia de seguridad APP Conductor (${backupDateStamp(d)}).json`}
@@ -572,7 +578,7 @@ function hasBackupData(){
     (t.weeklyRests||[]).length || t.initialSetupDone || t.baselineAt || t.manualTachBaselineAt || t.lastWeeklyRestEnd ||
     Number(t.weeklyDriveMin)||Number(t.biweeklyDriveMin)||Number(t.reducedDailyUsed)||Number(t.tenHourUsed));
 }
-function makeBackupPayload(){return {app:"Aplicación para Conductor",version:CONFIG.APP_VERSION||"5.5.3",exportedAt:new Date().toISOString(),data:JSON.parse(JSON.stringify(state))}}
+function makeBackupPayload(){return {app:"Aplicación para Conductor",version:CONFIG.APP_VERSION||"5.5.4",exportedAt:new Date().toISOString(),data:JSON.parse(JSON.stringify(state))}}
 function openBackupDB(){return new Promise((resolve,reject)=>{const req=indexedDB.open(BACKUP_DB_NAME,1);req.onupgradeneeded=()=>{const db=req.result;if(!db.objectStoreNames.contains(BACKUP_STORE))db.createObjectStore(BACKUP_STORE,{keyPath:"id",autoIncrement:true})};req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error)})}
 async function saveInternalBackup(reason="manual"){const payload=makeBackupPayload(),blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json"}),db=await openBackupDB();await new Promise((resolve,reject)=>{const tx=db.transaction(BACKUP_STORE,"readwrite"),store=tx.objectStore(BACKUP_STORE);store.add({name:backupFilename(),createdAt:new Date().toISOString(),reason,payload:JSON.stringify(payload)});tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error)});const all=await listInternalBackups();if(all.length>4){await new Promise((resolve,reject)=>{const tx=db.transaction(BACKUP_STORE,"readwrite"),store=tx.objectStore(BACKUP_STORE);all.sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt)).slice(4).forEach(x=>store.delete(x.id));tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error)})}db.close();renderBackupStatus();return blob}
 async function listInternalBackups(){const db=await openBackupDB();const rows=await new Promise((resolve,reject)=>{const tx=db.transaction(BACKUP_STORE,"readonly"),req=tx.objectStore(BACKUP_STORE).getAll();req.onsuccess=()=>resolve(req.result||[]);req.onerror=()=>reject(req.error)});db.close();return rows.sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt))}
@@ -611,7 +617,7 @@ $("importFile")?.addEventListener("change",e=>{const file=e.target.files?.[0];if
 
 
 
-if($("appVersion"))$("appVersion").textContent="v"+(CONFIG.APP_VERSION||"5.5.3");
+if($("appVersion"))$("appVersion").textContent="v"+(CONFIG.APP_VERSION||"5.5.4");
 renderBackupStatus();runScheduledBackups();
 
 initSelects();initPeriodEditor();updateUI();
