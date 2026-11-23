@@ -327,7 +327,7 @@ function recalculateTachograph(persist=true){
   const lastRestD=t.lastWeeklyRestEnd?new Date(t.lastWeeklyRestEnd):null;const initialReduced=(base&&!isNaN(base)&&!(lastRestD&&!isNaN(lastRestD)&&lastRestD>base))?Number(t.initialReducedDailySnapshot||0):0;
   const reduced=initialReduced+reducedDailyFromApp();t.reducedDailyUsed=reduced;
   t.pendingCompMin=recomputeWeeklyCompensations();
-  t.lastRecalculatedAt=now.toISOString();t.calcVersion="5.5.4";
+  t.lastRecalculatedAt=now.toISOString();t.calcVersion="5.5.5";
   if(persist)localStorage.setItem(DB_KEY,JSON.stringify(state));
   return {currentTotal,previousTotal,biweeklyTotal:calculatedBiweekly};
 }
@@ -578,7 +578,7 @@ function hasBackupData(){
     (t.weeklyRests||[]).length || t.initialSetupDone || t.baselineAt || t.manualTachBaselineAt || t.lastWeeklyRestEnd ||
     Number(t.weeklyDriveMin)||Number(t.biweeklyDriveMin)||Number(t.reducedDailyUsed)||Number(t.tenHourUsed));
 }
-function makeBackupPayload(){return {app:"Aplicación para Conductor",version:CONFIG.APP_VERSION||"5.5.4",exportedAt:new Date().toISOString(),data:JSON.parse(JSON.stringify(state))}}
+function makeBackupPayload(){return {app:"Aplicación para Conductor",version:CONFIG.APP_VERSION||"5.5.5",exportedAt:new Date().toISOString(),data:JSON.parse(JSON.stringify(state))}}
 function openBackupDB(){return new Promise((resolve,reject)=>{const req=indexedDB.open(BACKUP_DB_NAME,1);req.onupgradeneeded=()=>{const db=req.result;if(!db.objectStoreNames.contains(BACKUP_STORE))db.createObjectStore(BACKUP_STORE,{keyPath:"id",autoIncrement:true})};req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error)})}
 async function saveInternalBackup(reason="manual"){const payload=makeBackupPayload(),blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json"}),db=await openBackupDB();await new Promise((resolve,reject)=>{const tx=db.transaction(BACKUP_STORE,"readwrite"),store=tx.objectStore(BACKUP_STORE);store.add({name:backupFilename(),createdAt:new Date().toISOString(),reason,payload:JSON.stringify(payload)});tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error)});const all=await listInternalBackups();if(all.length>4){await new Promise((resolve,reject)=>{const tx=db.transaction(BACKUP_STORE,"readwrite"),store=tx.objectStore(BACKUP_STORE);all.sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt)).slice(4).forEach(x=>store.delete(x.id));tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error)})}db.close();renderBackupStatus();return blob}
 async function listInternalBackups(){const db=await openBackupDB();const rows=await new Promise((resolve,reject)=>{const tx=db.transaction(BACKUP_STORE,"readonly"),req=tx.objectStore(BACKUP_STORE).getAll();req.onsuccess=()=>resolve(req.result||[]);req.onerror=()=>reject(req.error)});db.close();return rows.sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt))}
@@ -617,7 +617,7 @@ $("importFile")?.addEventListener("change",e=>{const file=e.target.files?.[0];if
 
 
 
-if($("appVersion"))$("appVersion").textContent="v"+(CONFIG.APP_VERSION||"5.5.4");
+if($("appVersion"))$("appVersion").textContent="v"+(CONFIG.APP_VERSION||"5.5.5");
 renderBackupStatus();runScheduledBackups();
 
 initSelects();initPeriodEditor();updateUI();

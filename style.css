@@ -137,3 +137,21 @@ legend{padding:0 7px;font-weight:800;color:#145c3d}
 /* V5.5.2 - backups and visible version label */
 .app-version{display:inline-block;font-size:11px;font-weight:800;line-height:1;vertical-align:middle;white-space:nowrap;background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.45);border-radius:6px;padding:4px 6px;margin-left:4px;opacity:1}
 .backup-settings h2{margin-top:4px}.backup-settings hr{border:0;border-top:1px solid #e4ebe6;margin:18px 0}.backup-settings .wide{width:100%;margin:7px 0}.backup-status{font-size:13px;color:#52635a;background:#f1f6f3;border-radius:11px;padding:10px;margin:10px 0}
+
+/* V5.5.5 - etiqueta de versión, cierre mensual y avisos de conducción */
+.app-version-below{display:inline-block;margin:5px 0 0 0;font-size:10px;opacity:.88;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.35);border-radius:5px;padding:3px 6px}
+.tach-home-btn.tach-alert-yellow{background:#f6d65b!important;color:#554000!important;box-shadow:0 0 0 2px #d4a900,var(--shadow)}
+.tach-home-btn.tach-alert-red{background:#c62828!important;color:#fff!important;box-shadow:0 0 0 2px #a41414,var(--shadow)}
+.tach-available-card.tach-alert-yellow{background:#fff2bd!important;border-color:#e0bd36!important;color:#624b00}
+.tach-available-card.tach-alert-red{background:#ffe1df!important;border-color:#d62828!important;color:#8c1712}
+#monthlyCloseScreen .list-card{margin:0 0 13px;padding:15px;background:#fff;border-radius:16px;box-shadow:0 4px 14px rgba(0,0,0,.05)}
+#monthlyCloseScreen h2{margin:0 0 9px;color:#145c3d;font-size:17px}
+.payroll-summary{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.payroll-summary>div{background:#f4f8f5;border-radius:11px;padding:10px;min-width:0}
+.payroll-summary span{display:block;font-size:11px;color:#647168}.payroll-summary strong{display:block;margin-top:5px;font-size:15px;color:#145c3d;overflow-wrap:anywhere}
+.payroll-report-label{display:block;margin-top:14px;font-weight:800}.payroll-report-label textarea{width:100%;box-sizing:border-box;margin-top:7px;min-height:220px;font:14px/1.5 inherit}
+.payroll-manual-entry{display:grid;gap:10px;margin-top:13px;padding-top:12px;border-top:1px solid #e5ece7}.payroll-manual-entry label{display:grid;gap:5px;font-weight:700}.payroll-manual-entry select,.payroll-manual-entry input,.payroll-entry-row select{width:100%;min-width:0;box-sizing:border-box;padding:11px;border:1px solid #cbd8cf;border-radius:10px;background:#fff;font:inherit}
+.weekend-pair{padding:12px 0;border-top:1px solid #e7ede9;display:grid;gap:8px}.weekend-pair>strong{color:#145c3d}.weekend-pair>small{color:#68736d}.weekend-pair>div{display:flex;gap:10px;flex-wrap:wrap}.weekend-day{display:flex;align-items:center;gap:6px;background:#f2f6f3;border-radius:9px;padding:8px 10px;font-size:13px}.weekend-day input{width:18px;height:18px;accent-color:#0a7b47}.weekend-value{color:#0a7b47}.weekend-picker-open{display:block!important}
+.finish-payroll-entry{grid-column:1/-1;border-top:1px solid #e3ebe5;padding-top:12px;margin-top:4px}.finish-payroll-entry h3{margin:0 0 9px;color:#145c3d;font-size:15px}.payroll-entry-row{display:flex;gap:8px;align-items:center}.payroll-entry-row select{flex:1}.payroll-item-row{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 0;border-bottom:1px solid #edf1ee;font-size:12px}.payroll-item-row button{border:0;border-radius:8px;background:#ffe8e5;color:#a11f1a;padding:5px 10px;font-size:17px}
+@media(max-width:560px){.payroll-summary{grid-template-columns:1fr 1fr}.payroll-summary strong{font-size:13px}.payroll-entry-row{align-items:stretch;flex-direction:column}}
+.payroll-dialog{border:0;border-radius:18px;padding:18px;width:min(440px,calc(100% - 30px));max-height:85dvh;overflow:auto;box-shadow:0 18px 55px rgba(0,0,0,.3)}.payroll-dialog::backdrop{background:rgba(0,0,0,.5)}.payroll-dialog-head{display:flex;align-items:center;justify-content:space-between;gap:10px}.payroll-dialog-head h2{font-size:17px;color:#145c3d;margin:0}.payroll-dialog-head button{border:0;border-radius:9px;background:#eef4f0;padding:8px 10px;font-weight:800}

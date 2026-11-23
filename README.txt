@@ -192,7 +192,7 @@ LIMITACIONES DE LAS COPIAS LOCALES
 Una PWA no puede ejecutar tareas puntuales mientras está cerrada. La copia automática semanal se procesa al abrir la aplicación por primera vez después del lunes a las 00:01. IndexedDB permanece en el dispositivo, pero el usuario puede perderla al borrar los datos del navegador o desinstalar la PWA. Se recomienda descargar periódicamente una copia JSON y guardarla también en otro lugar seguro.
 
 
-V5.5.4 — INTEGRACIÓN SELECTIVA DE MEJORAS
+V5.5.5 — INTEGRACIÓN SELECTIVA DE MEJORAS
 -----------------------------------------
 - Integradas mejoras de contadores de ampliaciones de 10 h y descansos diarios reducidos sin topes artificiales.
 - Conservación de descansos reducidos al cambiar de semana, reconstruidos desde el historial.
@@ -206,3 +206,6 @@ V5.5.4 — INTEGRACIÓN SELECTIVA DE MEJORAS
 - Escapado de nombres de lugares en el historial para evitar inserción de HTML desde datos importados.
 - Ajustado el vencimiento de compensaciones al final de la tercera semana siguiente.
 - Se conserva el sistema de copias de seguridad locales que ya existía en V5.5.3.
+
+
+V5.5.5: incluye primer módulo de cierre mensual, selección manual de fines de semana fuera, registro inicial de trayectos Ferry/Tren e incentivos, edición del informe y avisos visuales de horas semanales/bisemanal.

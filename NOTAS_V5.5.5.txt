@@ -1,0 +1,25 @@
+APP CONDUCTOR NORIEGA - V5.5.5 (VERSION DE PRUEBAS)
+Base: V5.5.4 facilitada por el usuario.
+
+Incluye en esta compilación:
+- Número de versión debajo de “Jornadas · Repostajes · Estadísticas”.
+- Botón “Cierre del mes” y pantalla de resumen del periodo salarial 26-25.
+- Selector emergente de fines de semana: muestra parejas sábado/domingo del periodo y permite seleccionar uno o ambos días. Una pareja cuenta una sola vez.
+- Detección de fines de semana con jornadas cerradas en sábado/domingo y deduplicación con registros manuales.
+- Registro de trayectos Ferry/Tren con kilómetros fijos desde Fin de Jornada y desde Cierre del mes.
+- Catálogo inicial de incentivos económicos, edición de importes en Ajustes y registro con fecha desde Fin de Jornada o fecha opcional desde Cierre del mes.
+- Descargas múltiples: desde 3 inclusive, 8 euros por cada descarga (3 = 24 euros).
+- Informe editable, saludo personalizado de WhatsApp, saludo genérico de email y confirmación antes de abrir la aplicación externa.
+- Avisos de color semanal/bisemanal: blanco por encima de 9 h, amarillo desde 4,5 h hasta menos de 9 h, rojo por debajo de 4,5 h.
+- Caché del Service Worker actualizada e inclusión de payroll.js.
+
+LIMITACIONES CONOCIDAS DE ESTA VERSION DE PRUEBAS:
+- No se ha validado todavía en un iPhone real ni en Android; las comprobaciones realizadas son estáticas y de sintaxis.
+- El cálculo automático del fin de semana se basa en las fechas de cierre de jornadas registradas. Si el conductor permanece parado fuera de casa y no registra el incentivo, debe seleccionarlo en la ventana manual.
+- La pantalla de cierre es una primera implementación: todavía no incorpora el histórico/archivo de cierres mensuales ni la reapertura protegida.
+- Los importes de incentivos se guardan en cada registro, pero la gestión completa de vigencias históricas de salario base y tarifa por km necesita una siguiente revisión antes de usar los importes como liquidación definitiva.
+- Los incentivos por país/zona se registran manualmente; no se deducen automáticamente de los lugares de las jornadas.
+- Los km Ferry/Tren se suman a los km remunerados, pero no se incorporan a las estadísticas de conducción.
+- El envío/compartición se inicia en WhatsApp o en el cliente de correo; la PWA no puede confirmar que el destinatario haya recibido el mensaje.
+
+Recomendación: conservar la V5.5.4 y una copia JSON antes de instalar esta versión de pruebas.

@@ -23,7 +23,7 @@
         <div class="brand-block">
           <div class="brand">
             <img src="icon-192.png" alt="" class="brand-icon">
-            <div><div class="brand-title">Aplicación para Conductor <span id="appVersion" class="app-version">v5.5.4</span></div><div class="brand-sub">Jornadas · Repostajes · Estadísticas</div></div>
+            <div><div class="brand-title">APP Conductor Noriega</div><div class="brand-sub">Jornadas · Repostajes · Estadísticas</div><div id="appVersion" class="app-version app-version-below">v5.5.5</div></div>
           </div>
           <div class="sync-pill" id="syncStatus">📱 Datos se guardan en éste dispositivo</div>
         </div>
@@ -45,10 +45,11 @@
         </div>
         <div class="home-grid">
           <button id="statsBtn" class="secondary-action">📊 Estadísticas</button>
-          <button id="historyBtn" class="secondary-action">📋 Historial</button>
+          <button id="tachBtn" class="secondary-action tach-home-btn">⏱️ Control Tacógrafo</button>
           <button id="settingsBtn" class="secondary-action">⚙️ Ajustes</button>
-          <button id="tachBtn" class="secondary-action">⏱️ Control Tacógrafo</button>
-                  </div>
+          <button id="historyBtn" class="secondary-action">📋 Historial</button>
+          <button id="monthlyCloseBtn" class="secondary-action">📨 Cierre del mes</button>
+        </div>
       </div>
     </section>
 
@@ -85,7 +86,7 @@
           <a id="finishMap" class="map-link hidden" target="_blank" rel="noopener">Abrir en Google Maps</a>
         </label>
         <label class="notes-label"><span id="finishIncidentsLabel">Incidencias / Notas del conductor</span><textarea id="finishNote" placeholder="Escribe aquí cualquier incidencia u observación de la jornada…"></textarea></label>
-        <div class="form-actions"><button type="button" class="cancel-btn" data-back>Cancelar</button><button id="finishSave" class="save-btn" type="submit">Guardar</button></div>
+        <div id="finishPayrollEntry" class="finish-payroll-entry"><h3>Incentivos de esta jornada</h3><div class="payroll-entry-row"><select id="finishPayrollSelect"></select><input id="finishPayrollCount" type="number" min="3" step="1" placeholder="Nº descargas" aria-label="Número de descargas"><button id="addFinishPayrollItem" type="button" class="period-change-btn">Añadir</button></div><div id="finishPayrollItems"></div></div><div class="form-actions"><button type="button" class="cancel-btn" data-back>Cancelar</button><button id="finishSave" class="save-btn" type="submit">Guardar</button></div>
       </form>
     </section>
 
@@ -247,7 +248,30 @@
       <div class="history-wrap" id="fuelHistoryList"></div>
     </section>
 
-    <section id="settingsScreen" class="screen">
+    <section id="monthlyCloseScreen" class="screen">
+    <header class="page-head"><button class="back" data-back>←</button><h1>Cierre del mes</h1></header>
+    <div class="stats-wrap">
+      <div class="list-card">
+        <h2 id="payrollPeriodTitle">Periodo salarial</h2><p id="payrollPeriodRange"></p>
+        <div class="payroll-summary" id="payrollSummary"></div>
+      </div>
+      <div class="list-card">
+        <h2>Fin de semana fuera</h2>
+        <p>Selecciona una fecha o las dos fechas de cada fin de semana. Cada pareja seleccionada genera un único incentivo de 50 €.</p>
+        <button id="chooseWeekendsBtn" class="secondary-action wide" type="button">📅 Añadir fin de semana fuera</button>
+        <div class="payroll-manual-entry"><label>Incentivo manual<select id="manualPayrollSelect"></select></label><label>Fecha (opcional)<input id="manualPayrollDate" type="date"></label><label>Número de descargas (solo si corresponde)<input id="manualPayrollCount" type="number" min="3" step="1" placeholder="3, 4, 5…"></label><button id="addManualPayrollItem" class="period-change-btn" type="button">Añadir incentivo</button><div id="manualPayrollItems"></div></div>
+        <dialog id="weekendPickerDialog" class="payroll-dialog"><div class="payroll-dialog-head"><h2>Selecciona los días del fin de semana</h2><button id="closeWeekendPicker" type="button">Cerrar</button></div><p class="note">Puedes marcar el sábado, el domingo o ambos. Cada pareja cuenta como un único incentivo de 50 €.</p><div id="weekendSelectionList"></div></dialog>
+      </div>
+      <div class="list-card">
+        <h2>Informe mensual</h2>
+        <button id="generatePayrollReportBtn" class="save-btn" type="button">Generar informe</button>
+        <label class="payroll-report-label">Puedes editar el mensaje antes de compartirlo<textarea id="payrollReportText" rows="12"></textarea></label>
+        <div class="form-actions"><button id="sharePayrollWhatsApp" type="button" class="secondary-action">WhatsApp</button><button id="sharePayrollEmail" type="button" class="save-btn">Email</button></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="settingsScreen" class="screen">
       <header class="page-head"><button class="back" data-back>←</button><h1>Ajustes</h1></header>
       <div class="settings-card language-settings-card">
         <h2 id="languageSettingsTitle">Idioma / Language</h2>
@@ -261,6 +285,17 @@
           <option value="it">Italiano</option>
           <option value="de">Deutsch</option>
         </select>
+      </div>
+      <div class="settings-card" id="payrollSettingsCard">
+        <h2>Salario e incentivos</h2>
+        <label>Salario base mensual (€)<input id="payrollBaseSalary" type="number" min="0" step="0.01" value="1100"></label>
+        <label>Precio por kilómetro (€)<input id="payrollKmRate" type="number" min="0" step="0.001" value="0.14"></label>
+        <label>Nombre del destinatario de WhatsApp<input id="payrollWhatsAppName" type="text" placeholder="Carmen"></label>
+        <label>Número de WhatsApp (opcional)<input id="payrollWhatsAppNumber" type="tel"></label>
+        <label>Email destinatario (opcional)<input id="payrollEmail" type="email"></label>
+        <h3>Importes de incentivos (€)</h3><div id="payrollRateEditor"></div>
+        <button id="savePayrollSettings" type="button" class="save-btn">Guardar configuración salarial</button>
+        <p class="note">Los importes se guardan por registro para conservar el histórico cuando cambies las tarifas.</p>
       </div>
       <div class="settings-card backup-settings">
         <h2>Copias de seguridad</h2>
@@ -320,7 +355,7 @@
   <div id="toast" class="toast"></div>
 <script src="config.js"></script>
   <script src="i18n.js"></script>
-  <script src="app.js"></script><script>if("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js");</script>
+  <script src="app.js"></script><script src="payroll.js"></script><script>if("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js");</script>
 
 
 </body>
