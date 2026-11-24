@@ -23,7 +23,7 @@
         <div class="brand-block">
           <div class="brand">
             <img src="icon-192.png" alt="" class="brand-icon">
-            <div><div class="brand-title">APP Conductor Noriega</div><div class="brand-sub">Jornadas · Repostajes · Estadísticas</div><div id="appVersion" class="app-version app-version-below">v5.5.5</div></div>
+            <div class="brand-copy"><div class="brand-heading-row"><div class="brand-title">APP Conductor Noriega</div><span id="appVersion" class="app-version">v5.5.5</span></div><div class="brand-sub">Jornadas · Repostajes · Estadísticas</div></div>
           </div>
           <div class="sync-pill" id="syncStatus">📱 Datos se guardan en éste dispositivo</div>
         </div>
@@ -47,8 +47,8 @@
           <button id="statsBtn" class="secondary-action">📊 Estadísticas</button>
           <button id="tachBtn" class="secondary-action tach-home-btn">⏱️ Control Tacógrafo</button>
           <button id="settingsBtn" class="secondary-action">⚙️ Ajustes</button>
-          <button id="historyBtn" class="secondary-action">📋 Historial</button>
           <button id="monthlyCloseBtn" class="secondary-action">📨 Cierre del mes</button>
+          <button id="historyBtn" class="secondary-action">📋 Historial</button>
         </div>
       </div>
     </section>
@@ -258,7 +258,7 @@
       <div class="list-card">
         <h2>Fin de semana fuera</h2>
         <p>Selecciona una fecha o las dos fechas de cada fin de semana. Cada pareja seleccionada genera un único incentivo de 50 €.</p>
-        <button id="chooseWeekendsBtn" class="secondary-action wide" type="button">📅 Añadir fin de semana fuera</button>
+        <button id="chooseWeekendsBtn" class="weekend-add-btn" type="button">📅 Añadir fin de semana fuera</button>
         <div class="payroll-manual-entry"><label>Incentivo manual<select id="manualPayrollSelect"></select></label><label>Fecha (opcional)<input id="manualPayrollDate" type="date"></label><label>Número de descargas (solo si corresponde)<input id="manualPayrollCount" type="number" min="3" step="1" placeholder="3, 4, 5…"></label><button id="addManualPayrollItem" class="period-change-btn" type="button">Añadir incentivo</button><div id="manualPayrollItems"></div></div>
         <dialog id="weekendPickerDialog" class="payroll-dialog"><div class="payroll-dialog-head"><h2>Selecciona los días del fin de semana</h2><button id="closeWeekendPicker" type="button">Cerrar</button></div><p class="note">Puedes marcar el sábado, el domingo o ambos. Cada pareja cuenta como un único incentivo de 50 €.</p><div id="weekendSelectionList"></div></dialog>
       </div>
@@ -286,17 +286,7 @@
           <option value="de">Deutsch</option>
         </select>
       </div>
-      <div class="settings-card" id="payrollSettingsCard">
-        <h2>Salario e incentivos</h2>
-        <label>Salario base mensual (€)<input id="payrollBaseSalary" type="number" min="0" step="0.01" value="1100"></label>
-        <label>Precio por kilómetro (€)<input id="payrollKmRate" type="number" min="0" step="0.001" value="0.14"></label>
-        <label>Nombre del destinatario de WhatsApp<input id="payrollWhatsAppName" type="text" placeholder="Carmen"></label>
-        <label>Número de WhatsApp (opcional)<input id="payrollWhatsAppNumber" type="tel"></label>
-        <label>Email destinatario (opcional)<input id="payrollEmail" type="email"></label>
-        <h3>Importes de incentivos (€)</h3><div id="payrollRateEditor"></div>
-        <button id="savePayrollSettings" type="button" class="save-btn">Guardar configuración salarial</button>
-        <p class="note">Los importes se guardan por registro para conservar el histórico cuando cambies las tarifas.</p>
-      </div>
+      <button id="openPayrollSettingsBtn" class="settings-card settings-navigation" type="button"><span>💶</span><strong>Salario e incentivos</strong><span class="settings-chevron">›</span></button>
       <div class="settings-card backup-settings">
         <h2>Copias de seguridad</h2>
         <p>Las copias incluyen el histórico completo de jornadas, repostajes, documentos y Control Tacógrafo.</p>
@@ -306,6 +296,21 @@
         <button id="importDeviceBtn" type="button" class="secondary-action wide">📁 Importar copia desde el dispositivo (buscar archivo JSON)</button>
         <input id="importFile" type="file" accept=".json,application/json" hidden>
         <p class="note">Las copias automáticas se guardan en este dispositivo. También puedes descargar una copia JSON y recuperarla desde cualquier carpeta del dispositivo.</p>
+      </div>
+    </section>
+
+    <section id="payrollSettingsScreen" class="screen">
+      <header class="page-head"><button id="payrollSettingsBackTop" class="back" type="button">←</button><h1>Salario e incentivos</h1></header>
+      <div class="settings-card" id="payrollSettingsCard">
+        <div class="payroll-settings-title"><h2>Salario e incentivos</h2><button id="modifyPayrollSettings" class="period-change-btn" type="button">Modificar</button></div>
+        <label>Salario base mensual (€)<input id="payrollBaseSalary" type="number" min="0" step="0.01" value="1100" readonly></label>
+        <label>Precio por kilómetro (€)<input id="payrollKmRate" type="number" min="0" step="0.001" value="0.14" readonly></label>
+        <label>Nombre del destinatario de WhatsApp<input id="payrollWhatsAppName" type="text" placeholder="Carmen" readonly></label>
+        <label>Número de WhatsApp (opcional)<input id="payrollWhatsAppNumber" type="tel" readonly></label>
+        <label>Email destinatario (opcional)<input id="payrollEmail" type="email" readonly></label>
+        <h3>Importes de incentivos (€)</h3><div id="payrollRateEditor"></div>
+        <div class="payroll-settings-actions"><button id="savePayrollSettings" type="button" class="save-btn">Guardar</button><button id="payrollSettingsBack" type="button" class="cancel-btn">Atrás</button></div>
+        <p class="note">Los importes se guardan por registro para conservar el histórico cuando cambies las tarifas.</p>
       </div>
     </section>
 

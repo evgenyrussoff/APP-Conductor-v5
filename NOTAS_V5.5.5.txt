@@ -23,3 +23,11 @@ LIMITACIONES CONOCIDAS DE ESTA VERSION DE PRUEBAS:
 - El envío/compartición se inicia en WhatsApp o en el cliente de correo; la PWA no puede confirmar que el destinatario haya recibido el mensaje.
 
 Recomendación: conservar la V5.5.4 y una copia JSON antes de instalar esta versión de pruebas.
+
+AJUSTES VISUALES ADICIONALES (compilación de diseño)
+- La etiqueta de versión se ha movido a la derecha del título de la aplicación.
+- En la pantalla principal, «Cierre del mes» queda entre «Ajustes» e «Historial»; la fila inferior usa tres botones más estrechos.
+- «Salario e incentivos» ahora es una entrada independiente dentro de Ajustes. Los valores se muestran inicialmente en solo lectura; «Modificar» activa la edición y «Guardar» guarda y vuelve al modo de lectura. «Atrás» regresa a Ajustes.
+- «Añadir fin de semana fuera» tiene ahora estilo visual de botón.
+- Se ha incrementado la versión de caché del service worker para que el navegador descargue los archivos actualizados.
+- La versión funcional sigue identificada como 5.5.5; estos cambios son de interfaz y no alteran la lógica de cálculo salarial.
